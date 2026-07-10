@@ -1,0 +1,919 @@
+schema_version: "0.4.0"
+
+specification:
+  id: "temporal-causality-binding"
+  name: "Temporal Causality Binding"
+  short_name: "TCB"
+  status: "candidate"
+
+  purpose: >
+    Define how temporal states, available evidence,
+    evaluations, decisions, actions, and observed outcomes
+    are bound into explicit and auditable causal paths.
+
+  core_principle: >
+    Temporal order alone does not establish causality.
+
+    A valid causal claim MUST distinguish:
+    what existed,
+    what was available,
+    what was actually used,
+    what influenced the decision,
+    what triggered the action,
+    and what outcome was later observed.
+
+  normative_rule: >
+    A causal binding MUST NOT claim that information,
+    evidence, policy, or state influenced a decision
+    if it was unavailable or structurally inaccessible
+    at the relevant decision time.
+
+definitions:
+
+  temporal_causal_binding:
+    definition: >
+      An explicit directed relation connecting two or more
+      temporally situated entities through evidence-supported
+      causal influence.
+
+  causal_path:
+    definition: >
+      An ordered sequence of causal bindings connecting
+      state, evidence, evaluation, decision, action,
+      and observed outcome.
+
+  decision_context:
+    definition: >
+      The immutable or versioned snapshot of state,
+      available evidence, applicable policies,
+      constraints, goals, and environmental signals
+      at decision time.
+
+  evidence_availability:
+    definition: >
+      A record establishing whether an evidence item
+      was available, discoverable, accessible, or actually used
+      when a decision was made.
+
+  causal_influence:
+    definition: >
+      A supported claim that a predecessor entity materially
+      affected the probability, content, permission,
+      route, timing, or execution of a successor entity.
+
+  counterfactual_support:
+    definition: >
+      Evidence indicating whether removing or changing
+      a predecessor condition would plausibly alter
+      the downstream decision or action.
+
+  temporal_illusion:
+    definition: >
+      A failure mode in which a later reconstruction,
+      explanation, or discovered fact is presented
+      as though it had participated in the original runtime decision.
+
+causal_entity_types:
+
+  allowed:
+    - pulse
+    - state
+    - evidence
+    - observation
+    - goal
+    - constraint
+    - policy
+    - evaluation
+    - decision
+    - transition
+    - cadence_decision
+    - action
+    - tool_call
+    - handoff
+    - trace
+    - outcome
+    - origin
+    - human_review
+
+causal_relation_types:
+
+  direct_cause:
+    description: >
+      The predecessor directly contributed to the successor event
+      through an observable runtime dependency.
+
+  contributing_cause:
+    description: >
+      The predecessor materially influenced the successor
+      but was not sufficient by itself.
+
+  enabling_condition:
+    description: >
+      The predecessor made the successor possible
+      without directly triggering it.
+
+  constraining_condition:
+    description: >
+      The predecessor limited the available decision
+      or action space.
+
+  authorizing_condition:
+    description: >
+      The predecessor granted permission
+      for the successor transition or action.
+
+  triggering_event:
+    description: >
+      The predecessor initiated evaluation,
+      transition, cadence change, or action.
+
+  routing_influence:
+    description: >
+      The predecessor changed where processing,
+      delegation, handoff, or execution occurred.
+
+  timing_influence:
+    description: >
+      The predecessor changed when evaluation
+      or action occurred.
+
+  inhibiting_cause:
+    description: >
+      The predecessor prevented or delayed
+      an otherwise possible successor event.
+
+  counterfactual_dependency:
+    description: >
+      The successor is supported as dependent
+      on the predecessor through intervention,
+      controlled comparison, replay, or structured simulation.
+
+  disputed_causality:
+    description: >
+      A causal relation has been challenged
+      or has unresolved competing explanations.
+
+temporal_causal_path:
+
+  canonical_flow:
+    - pulse
+    - state_snapshot
+    - evidence_availability
+    - evaluation
+    - decision
+    - transition_or_action
+    - observed_outcome
+    - causal_assessment
+
+  minimum_path:
+    required_nodes:
+      - predecessor
+      - successor
+
+    required_binding_fields:
+      - binding_id
+      - predecessor_ref
+      - successor_ref
+      - relation_type
+      - causal_basis
+      - temporal_context
+      - evidence_refs
+      - confidence
+
+  preferred_agent_path:
+    canonical_form: >
+      Pulse
+      -> State Snapshot
+      -> Available Evidence
+      -> Evaluation
+      -> Decision
+      -> Action
+      -> Outcome
+
+decision_context_model:
+
+  purpose: >
+    Preserve the actual information environment
+    in which a decision occurred.
+
+  required_fields:
+    - context_id
+    - captured_at
+    - state_ref
+    - pulse_ref
+    - available_evidence_refs
+    - applicable_policy_refs
+    - active_goal_refs
+    - active_constraint_refs
+
+  optional_fields:
+    - environmental_signal_refs
+    - memory_refs
+    - tool_result_refs
+    - human_instruction_refs
+    - cadence_decision_ref
+
+  immutability_rule: >
+    A published decision context MUST NOT be silently rewritten
+    after the decision is made.
+
+  correction_rule: >
+    Corrections MUST create a superseding context version
+    or an explicit retrospective annotation.
+
+evidence_availability_model:
+
+  availability_statuses:
+    - available
+    - accessible_but_unused
+    - used
+    - unavailable
+    - unknown
+    - discovered_later
+
+  required_fields:
+    - evidence_ref
+    - availability_status
+    - availability_checked_at
+
+  optional_fields:
+    - available_from
+    - first_accessed_at
+    - used_at
+    - source_ref
+    - access_path_ref
+
+  causal_use_rule: >
+    Evidence MAY be claimed as a runtime causal influence
+    only when availability_status is used,
+    or when an explicit runtime dependency
+    can otherwise be demonstrated.
+
+  unused_evidence_rule: >
+    Evidence that was available but unused
+    MUST NOT automatically be represented
+    as a cause of the decision.
+
+  later_discovery_rule: >
+    Evidence marked discovered_later MAY support
+    retrospective causal analysis,
+    but MUST NOT be represented as runtime-observed influence.
+
+causal_binding_model:
+
+  required_fields:
+    - binding_id
+    - predecessor_ref
+    - predecessor_type
+    - successor_ref
+    - successor_type
+    - relation_type
+    - causal_basis
+    - temporal_context
+    - evidence_refs
+    - confidence
+    - assertion_mode
+
+  assertion_modes:
+    - runtime_observed
+    - machine_inferred
+    - retrospective_inference
+    - counterfactual_supported
+    - human_verified
+    - disputed
+
+  temporal_context:
+    required_fields:
+      - predecessor_time
+      - successor_time
+      - binding_asserted_at
+
+    optional_fields:
+      - evidence_available_from
+      - verified_at
+      - disputed_at
+
+  causal_basis:
+    allowed:
+      - explicit_runtime_reference
+      - policy_dependency
+      - state_diff
+      - execution_dependency
+      - action_receipt
+      - tool_call_dependency
+      - handoff_dependency
+      - intervention_result
+      - replay_comparison
+      - counterfactual_simulation
+      - human_review
+      - statistical_association
+      - unknown
+
+  confidence:
+    minimum: 0.0
+    maximum: 1.0
+
+  confidence_rule: >
+    Confidence MUST represent evidential strength.
+    Confidence alone MUST NOT transform correlation
+    into established causation.
+
+state_to_decision_binding:
+
+  purpose: >
+    Determine whether and how a temporal state
+    influenced a decision.
+
+  required_checks:
+    - state existed at decision time
+    - state was active or applicable
+    - decision context references state
+    - claimed influence mechanism is identified
+
+  allowed_mechanisms:
+    - goal_priority
+    - risk_assessment
+    - attention_focus
+    - unresolved_issue
+    - resource_condition
+    - safety_constraint
+    - memory_activation
+    - route_preference
+
+  canonical_form: >
+    State(t)
+    -> Evaluation(t)
+    -> Decision(t)
+
+  prohibition: >
+    A state that was superseded before decision time
+    MUST NOT be claimed as the active runtime cause
+    unless an explicit residual influence path is recorded.
+
+decision_to_action_binding:
+
+  purpose: >
+    Determine whether an action was executed
+    because of a prior decision.
+
+  required_checks:
+    - decision exists
+    - action occurs after decision
+    - action references decision or execution policy
+    - no conflicting later decision superseded it
+
+  canonical_form: >
+    Decision
+    -> Authorization
+    -> Action
+
+  allowed_action_types:
+    - internal_update
+    - external_tool_call
+    - agent_handoff
+    - message_emit
+    - artifact_generation
+    - resource_allocation
+    - state_transition
+    - cadence_change
+    - no_action
+
+  no_action_rule: >
+    A decision to intentionally take no action
+    MAY be recorded as a causal outcome
+    when the restraint is materially significant.
+
+pulse_to_transition_binding:
+
+  purpose: >
+    Bind Pulse events to state evaluation
+    and resulting state transitions.
+
+  canonical_form: >
+    Pulse
+    -> Evaluation
+    -> Transition Proposal
+    -> Transition Decision
+    -> Successor State
+
+  requirements:
+    - pulse_ref
+    - evaluation_ref
+    - transition_ref
+    - predecessor_state_ref
+    - successor_state_ref
+
+  rule: >
+    A Pulse MAY lead to retention rather than transition.
+
+  retention_path:
+    canonical_form: >
+      Pulse
+      -> Evaluation
+      -> Retain Decision
+      -> State Retention Trace
+
+cadence_causality_binding:
+
+  purpose: >
+    Bind current state conditions
+    to the next Pulse timing policy.
+
+  canonical_form: >
+    State Signals
+    -> Cadence Evaluation
+    -> Cadence Decision
+    -> Next Pulse Policy
+
+  required_checks:
+    - cited signals existed at decision time
+    - resource constraints were evaluated
+    - safety priority was preserved
+    - hysteresis policy was considered when applicable
+
+  prohibition: >
+    Later workload or risk information MUST NOT be used
+    to falsely justify an earlier cadence decision.
+
+counterfactual_support_model:
+
+  purpose: >
+    Strengthen or challenge causal claims
+    through controlled comparison.
+
+  methods:
+
+    intervention:
+      description: >
+        Modify or remove a predecessor factor
+        and observe whether the successor changes.
+
+      evidential_strength: "high_when_controlled"
+
+    replay:
+      description: >
+        Re-execute a recorded decision context
+        with selected variables altered.
+
+      evidential_strength: "medium_to_high"
+
+    comparison:
+      description: >
+        Compare similar paths with and without
+        the claimed predecessor condition.
+
+      evidential_strength: "medium"
+
+    simulation:
+      description: >
+        Evaluate hypothetical successor behavior
+        under a modified predecessor state.
+
+      evidential_strength: "supportive_not_conclusive"
+
+    human_analysis:
+      description: >
+        A reviewer evaluates the claimed dependency
+        using available trace and context.
+
+      evidential_strength: "context_dependent"
+
+  result_types:
+    - supports
+    - weakly_supports
+    - neutral
+    - weakens
+    - contradicts
+    - inconclusive
+
+  rule: >
+    Counterfactual analysis MUST preserve its method,
+    assumptions, model version, and execution context.
+
+causal_path_construction:
+
+  purpose: >
+    Construct a directed path across temporal entities.
+
+  requirements:
+    - path_id
+    - root_ref
+    - terminal_ref
+    - ordered_binding_refs
+    - path_status
+    - aggregate_confidence
+
+  path_statuses:
+    - candidate
+    - supported
+    - verified
+    - disputed
+    - incomplete
+    - rejected
+
+  aggregation_rule: >
+    Aggregate confidence SHOULD NOT exceed
+    the strength justified by the weakest critical dependency
+    without an explicit aggregation method.
+
+  gap_rule: >
+    Missing intermediate bindings MUST be represented
+    as causal gaps rather than silently inferred.
+
+  branch_rule: >
+    Competing causal explanations MAY coexist
+    as separate candidate paths.
+
+causal_dispute_model:
+
+  purpose: >
+    Preserve competing causal interpretations
+    without rewriting historical records.
+
+  dispute_statuses:
+    - open
+    - under_review
+    - partially_resolved
+    - resolved
+    - rejected
+
+  required_fields:
+    - dispute_id
+    - challenged_binding_refs
+    - challenger_type
+    - challenge_reason
+    - opened_at
+
+  optional_fields:
+    - competing_path_refs
+    - counter_evidence_refs
+    - reviewer_refs
+    - resolution_ref
+
+  rule: >
+    A disputed causal claim MUST remain visible
+    to downstream audit and attribution systems.
+
+temporal_illusion_detection:
+
+  id: "TID"
+  name: "Temporal Illusion Detection"
+
+  detection_rules:
+
+    TID_001_late_evidence_injection:
+      severity: "error"
+
+      condition: >
+        Evidence discovered after decision time
+        is represented as a runtime causal influence.
+
+      failure_code: "LATE_EVIDENCE_INJECTION"
+
+    TID_002_reconstructed_context_substitution:
+      severity: "error"
+
+      condition: >
+        A retrospective reconstruction replaces
+        the original decision context without versioning.
+
+      failure_code: "CONTEXT_REWRITE"
+
+    TID_003_post_hoc_narrative:
+      severity: "warning"
+
+      condition: >
+        A causal explanation exists without
+        runtime reference, dependency evidence,
+        or explicit retrospective labeling.
+
+      failure_code: "POST_HOC_CAUSAL_NARRATIVE"
+
+    TID_004_timestamp_causality:
+      severity: "warning"
+
+      condition: >
+        A causal claim is supported only
+        by earlier timestamp order.
+
+      failure_code: "CHRONOLOGY_ONLY_CAUSALITY"
+
+    TID_005_future_knowledge_backflow:
+      severity: "error"
+
+      condition: >
+        A later outcome or later knowledge
+        is treated as information available
+        to an earlier decision.
+
+      failure_code: "FUTURE_KNOWLEDGE_BACKFLOW"
+
+    TID_006_superseded_decision_confusion:
+      severity: "error"
+
+      condition: >
+        An action is attributed to a decision
+        that had been superseded before execution.
+
+      failure_code: "SUPERSEDED_DECISION_ATTRIBUTION"
+
+temporal_causality_consistency_check:
+
+  id: "TCCC"
+  name: "Temporal Causality Consistency Check"
+
+  execution_modes:
+    - on_binding_create
+    - on_path_create
+    - on_action_receipt
+    - on_trace_emit
+    - on_dispute
+    - scheduled_audit
+
+  checks:
+
+    TCCC_001_entity_resolution:
+      severity: "error"
+
+      requirement: >
+        All causal entities MUST resolve
+        to identifiable records or explicit unresolved placeholders.
+
+      failure_code: "UNRESOLVED_CAUSAL_ENTITY"
+
+    TCCC_002_temporal_direction:
+      severity: "error"
+
+      requirement: >
+        Runtime causal influence MUST NOT flow
+        from a later event to an earlier decision.
+
+      failure_code: "TEMPORAL_DIRECTION_INVERSION"
+
+    TCCC_003_evidence_availability:
+      severity: "error"
+
+      requirement: >
+        Runtime causal evidence MUST have been available
+        and applicable at decision time.
+
+      failure_code: "EVIDENCE_NOT_AVAILABLE_AT_DECISION"
+
+    TCCC_004_decision_context_integrity:
+      severity: "error"
+
+      requirement: >
+        Decision context MUST remain versioned
+        and historically reconstructable.
+
+      failure_code: "DECISION_CONTEXT_INTEGRITY_FAILURE"
+
+    TCCC_005_binding_basis:
+      severity: "error"
+
+      requirement: >
+        Every causal binding MUST declare
+        a causal basis and evidence references.
+
+      failure_code: "MISSING_CAUSAL_BASIS"
+
+    TCCC_006_action_decision_continuity:
+      severity: "error"
+
+      requirement: >
+        Action attribution MUST identify
+        the active decision or execution policy.
+
+      failure_code: "BROKEN_DECISION_ACTION_CHAIN"
+
+    TCCC_007_path_gap_visibility:
+      severity: "warning"
+
+      requirement: >
+        Missing causal links MUST remain visible
+        as explicit path gaps.
+
+      failure_code: "HIDDEN_CAUSAL_GAP"
+
+    TCCC_008_counterfactual_method_integrity:
+      severity: "warning"
+
+      requirement: >
+        Counterfactual support MUST record method,
+        assumptions, and execution context.
+
+      failure_code: "UNSUPPORTED_COUNTERFACTUAL_CLAIM"
+
+    TCCC_009_dispute_visibility:
+      severity: "error"
+
+      requirement: >
+        Open causal disputes MUST remain visible
+        in downstream audit and attribution processing.
+
+      failure_code: "HIDDEN_CAUSAL_DISPUTE"
+
+    TCCC_010_temporal_illusion_scan:
+      severity: "error"
+
+      requirement: >
+        Causal paths MUST pass applicable
+        Temporal Illusion Detection checks.
+
+      failure_code: "TEMPORAL_ILLUSION_DETECTED"
+
+failure_modes:
+
+  temporal_illusion:
+    description: >
+      A later reconstruction is presented
+      as runtime causal history.
+
+    symptoms:
+      - later evidence appears in earlier decision context
+      - retrospective analysis labeled runtime_observed
+      - original state snapshot is replaced
+
+    mitigation:
+      - immutable decision context
+      - evidence availability ledger
+      - assertion mode labeling
+      - Temporal Illusion Detection
+
+  chronology_causality_confusion:
+    description: >
+      Earlier occurrence is treated as sufficient proof
+      of causal influence.
+
+    symptoms:
+      - no influence mechanism
+      - no runtime reference
+      - no dependency evidence
+
+    mitigation:
+      - causal basis requirement
+      - evidence references
+      - counterfactual support
+      - confidence reduction
+
+  causal_path_hallucination:
+    description: >
+      Missing intermediate causal links
+      are filled with plausible but unsupported explanations.
+
+    symptoms:
+      - complete narrative without intermediate records
+      - unexplained transitions
+      - inferred bindings presented as observed
+
+    mitigation:
+      - explicit causal gaps
+      - candidate path status
+      - retrospective inference label
+      - human review for high-impact paths
+
+  evidence_backfill:
+    description: >
+      Later evidence is inserted into an earlier decision path
+      as though it had been used originally.
+
+    mitigation:
+      - availability status tracking
+      - separate discovered_at and used_at
+      - immutable context snapshot
+
+  decision_action_misattribution:
+    description: >
+      An action is assigned to the wrong decision,
+      an expired decision, or a merely correlated decision.
+
+    mitigation:
+      - execution dependency record
+      - action receipt binding
+      - active decision check
+      - supersession validation
+
+  causal_overconfidence:
+    description: >
+      Weak association or incomplete evidence
+      is represented as established causation.
+
+    mitigation:
+      - confidence scoring
+      - causal basis taxonomy
+      - counterfactual analysis
+      - dispute support
+
+  causal_under_specification:
+    description: >
+      A causal claim identifies predecessor and successor
+      but not the mechanism connecting them.
+
+    mitigation:
+      - relation_type requirement
+      - causal_basis requirement
+      - evidence reference requirement
+
+  hidden_competing_path:
+    description: >
+      One causal explanation is accepted
+      while meaningful competing explanations are suppressed.
+
+    mitigation:
+      - candidate path coexistence
+      - dispute record
+      - competing_path_refs
+      - audit review
+
+  outcome_backflow:
+    description: >
+      A later observed outcome is treated
+      as an input to the earlier decision that produced it.
+
+    mitigation:
+      - event-time separation
+      - decision context snapshot
+      - future knowledge backflow check
+
+safety_requirements:
+
+  SR_001:
+    rule: >
+      High-impact actions SHOULD NOT be represented
+      as causally justified when the decision-to-action chain
+      contains unresolved critical gaps.
+
+  SR_002:
+    rule: >
+      Evidence discovered after execution MUST NOT
+      be silently injected into runtime causal history.
+
+  SR_003:
+    rule: >
+      Counterfactual simulation alone SHOULD NOT
+      be treated as conclusive proof of runtime causality.
+
+  SR_004:
+    rule: >
+      Disputed causal paths affecting safety,
+      rights, or high-value attribution SHOULD require
+      human or multi-party review.
+
+  SR_005:
+    rule: >
+      Temporal Illusion findings MUST propagate
+      to downstream Trace, Audit, Origin, and Royalty layers.
+
+integration:
+
+  pulse_record:
+    relation: >
+      Supplies the temporal opportunity
+      from which evaluation begins.
+
+  state_transition_rule:
+    relation: >
+      Supplies state lineage and valid transition records.
+
+  adaptive_cadence_policy:
+    relation: >
+      Supplies timing decisions and the state signals
+      that influenced future Pulse scheduling.
+
+  structural_precedence_core:
+    relation: >
+      Supplies local, structural, and ontological
+      precedence categories.
+
+  trace_relay_protocol:
+    relation: >
+      Receives portable causal path records
+      and transmits them across agents and transformations.
+
+  origin_trace_receipt:
+    relation: >
+      Supplies upstream provenance
+      without rewriting runtime decision context.
+
+  ai_origin_royalty_audit:
+    relation: >
+      Consumes supported causal contribution paths
+      for downstream attribution review.
+
+  future_trace_audit_bridge:
+    relation: >
+      Exports causal bindings, gaps,
+      confidence, disputes, and Temporal Illusion findings
+      into the final v0.5 audit bridge.
+
+final_principle: >
+  A temporal history becomes causally meaningful
+  only when the system can distinguish:
+
+  what happened before,
+  what was actually available,
+  what was actually used,
+  what changed the decision,
+  what caused the action,
+  what outcome followed,
+  and what remains uncertain or disputed.
