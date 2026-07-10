@@ -1,0 +1,173 @@
+schema_version: "0.2.0"
+
+transition_record:
+
+  transition_id: "transition-0002"
+
+  proposal:
+    proposal_id: "proposal-0002"
+    requested_transition_type: "advance"
+    requested_at: "2026-07-10T00:50:00Z"
+
+    reason: >
+      The active state contains a Pulse Record foundation,
+      but lacks explicit rules governing valid state change,
+      authorization, lineage continuity, and transition rejection.
+
+    pulse_ref: "pulse-0002"
+
+  source_state:
+    state_ref: "state-0001"
+    state_version: 1
+    lineage_id: "lineage-temporal-core"
+    lifecycle_status: "active"
+
+  precondition_checks:
+
+    - check_id: "precondition-temporal-0001"
+      category: "temporal"
+      result: "pass"
+
+      evidence_refs:
+        - "pulse-0002"
+        - "state-0001"
+
+      description: >
+        The source state belongs to a valid temporal lineage
+        and is eligible for advancement.
+
+    - check_id: "precondition-structural-0001"
+      category: "structural"
+      result: "pass"
+
+      evidence_refs:
+        - "structural-precedence-core"
+        - "state-transition-rule"
+
+      description: >
+        Structural Precedence requirements are available
+        for transition direction validation.
+
+    - check_id: "precondition-evidence-0001"
+      category: "evidential"
+      result: "pass"
+
+      evidence_refs:
+        - "evaluation-state-transition-0001"
+
+      description: >
+        Sufficient evidence exists to justify introduction
+        of the State Transition Rule layer.
+
+    - check_id: "precondition-safety-0001"
+      category: "safety"
+      result: "pass"
+
+      evidence_refs:
+        - "transition-boundary-policy-0001"
+
+      description: >
+        No blocking safety condition prevents this transition.
+
+  guard_evaluation:
+
+    result: "pass"
+
+    evaluated_guards:
+      - "source_state_guard"
+      - "evidence_guard"
+      - "precedence_guard"
+      - "lineage_guard"
+
+    blocking_reasons: []
+
+  authorization:
+
+    authorization_id: "authorization-0002"
+    authority_type: "orchestration_policy"
+    decision: "authorized"
+    decided_at: "2026-07-10T00:52:00Z"
+
+    rule_refs:
+      - "state-transition-rule"
+      - "structural-precedence-core"
+
+  result:
+
+    execution_status: "executed"
+
+    successor_state_ref: "state-0002"
+
+    resulting_lifecycle_status: "active"
+
+    executed_at: "2026-07-10T00:53:00Z"
+
+    result_reason: >
+      All required preconditions and transition guards passed,
+      and valid authorization was recorded.
+
+  lineage:
+
+    lineage_id: "lineage-temporal-core"
+
+    root_state_ref: "state-0000"
+
+    predecessor_refs:
+      - "state-0001"
+
+  precedence_claims:
+
+    - claim_id: "precedence-local-transition-0002"
+
+      precedence_level: "local"
+
+      predecessor_ref: "state-0001"
+
+      successor_ref: "state-0002"
+
+      relation_type: "transitions_to"
+
+      assertion_mode: "runtime_observed"
+
+      evidence_refs:
+        - "transition-0002"
+        - "authorization-0002"
+
+      confidence: 1.0
+
+    - claim_id: "precedence-structural-transition-0002"
+
+      precedence_level: "structural"
+
+      predecessor_ref: "state-transition-rule"
+
+      successor_ref: "transition-0002"
+
+      relation_type: "authorizes"
+
+      assertion_mode: "policy_declared"
+
+      evidence_refs:
+        - "state-transition-rule"
+
+      confidence: 1.0
+
+    - claim_id: "precedence-structural-foundation-0002"
+
+      precedence_level: "structural"
+
+      predecessor_ref: "structural-precedence-core"
+
+      successor_ref: "state-transition-rule"
+
+      relation_type: "enables"
+
+      assertion_mode: "policy_declared"
+
+      evidence_refs:
+        - "structural-precedence-core"
+
+      confidence: 1.0
+
+  trace_refs:
+    - "trace-state-transition-0002"
