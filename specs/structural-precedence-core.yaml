@@ -1,0 +1,199 @@
+schema_version: "0.1.0"
+
+specification:
+  id: "structural-precedence-core"
+  name: "Structural Precedence Core"
+  status: "candidate"
+
+  purpose: >
+    Define directed precedence relations across temporal states,
+    structural prerequisites, and foundational origins.
+
+  principle: >
+    Chronological order alone MUST NOT be treated as proof of causality.
+
+definitions:
+
+  structural_precedence:
+    symbol: "A ≺ B"
+
+    definition: >
+      A directed relation asserting that A is locally,
+      structurally, or ontologically prior to B.
+
+    requirements:
+      - predecessor_ref
+      - successor_ref
+      - precedence_level
+      - relation_type
+      - evidence_refs
+
+precedence_levels:
+
+  local:
+    description: >
+      Direct causation between temporal states,
+      transitions, evaluations, or events.
+
+    canonical_form: >
+      State(t) -> Transition -> State(t+1)
+
+    allowed_relations:
+      - triggers
+      - transitions_to
+      - causes
+      - evaluated_before
+      - activates
+
+  structural:
+    description: >
+      A prerequisite structure, policy, capability,
+      constraint, or route enables or constrains
+      another state or transition.
+
+    canonical_form: >
+      Prerequisite Structure -> Allowed Transition Space
+
+    allowed_relations:
+      - requires
+      - enables
+      - constrains
+      - authorizes
+      - prohibits
+      - routes
+      - conditions
+      - inherits_from
+
+  ontological:
+    description: >
+      A foundational origin, source, rule,
+      or contribution basis makes a derivative
+      structure or temporal process possible.
+
+    canonical_form: >
+      Origin -> Derivative Possibility -> Temporal Process
+
+    allowed_relations:
+      - originates_from
+      - derives_from
+      - constituted_by
+      - made_possible_by
+
+precedence_claim:
+
+  required_fields:
+    - claim_id
+    - precedence_level
+    - predecessor_ref
+    - successor_ref
+    - relation_type
+    - assertion_mode
+    - evidence_refs
+
+  assertion_modes:
+    - runtime_observed
+    - policy_declared
+    - retrospective_inference
+    - human_verified
+    - machine_verified
+
+  confidence:
+    minimum: 0.0
+    maximum: 1.0
+
+integrity_rules:
+
+  chronological_non_equivalence:
+    rule: >
+      Earlier timestamps MUST NOT automatically establish causal precedence.
+
+  directionality:
+    rule: >
+      A precedence relation MUST have an explicit predecessor
+      and successor.
+
+  retrospective_labeling:
+    rule: >
+      Causal relations inferred after runtime MUST be labeled
+      as retrospective_inference.
+
+  immutable_history:
+    rule: >
+      Historical states and transitions MUST NOT be overwritten
+      to accommodate later causal interpretations.
+
+  versioned_correction:
+    rule: >
+      Corrections MUST create a new claim version
+      or explicit supersession relation.
+
+  origin_time_separation:
+    rule: >
+      causal_effective_time, discovered_at,
+      asserted_at, and verified_at MUST remain distinct
+      when their meanings differ.
+
+failure_modes:
+
+  precedence_collapse:
+    description: >
+      Local, structural, and ontological precedence
+      are flattened into one undifferentiated causal relation.
+
+  temporal_illusion:
+    description: >
+      A retrospectively reconstructed sequence is presented
+      as if it were directly observed during runtime.
+
+  causal_direction_inversion:
+    description: >
+      A downstream result is incorrectly represented
+      as the upstream cause of its own history.
+
+  retroactive_origin_injection:
+    description: >
+      A newly discovered origin is inserted into historical state
+      as though it had been known during runtime.
+
+  precedence_cycle:
+    description: >
+      Historical causal claims create circular precedence
+      without distinct temporal state versions.
+
+minimum_checks:
+
+  - id: "PCC-001"
+    name: "Direction Check"
+    requirement: >
+      predecessor_ref and successor_ref MUST be distinct
+      and directionally explicit.
+
+  - id: "PCC-002"
+    name: "Evidence Check"
+    requirement: >
+      Every precedence claim MUST contain at least one evidence reference
+      or an explicit unresolved evidence status.
+
+  - id: "PCC-003"
+    name: "Retrospective Label Check"
+    requirement: >
+      Later causal reconstruction MUST NOT be represented
+      as runtime observation.
+
+  - id: "PCC-004"
+    name: "Cycle Check"
+    requirement: >
+      Historical precedence relations MUST NOT create
+      an unresolved causal cycle.
+
+  - id: "PCC-005"
+    name: "Time Separation Check"
+    requirement: >
+      Event time, discovery time, assertion time,
+      and verification time MUST NOT be silently conflated.
+
+final_principle: >
+  Pulse gives a system opportunities for change.
+  Structural Precedence gives those changes causal direction.
+  Trace preserves the resulting history.
+  Audit tests whether the direction remains coherent.
