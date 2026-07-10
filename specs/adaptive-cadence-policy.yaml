@@ -23,983 +23,780 @@ specification:
     event, evaluation, policy, or constraint that caused it.
 
 definitions:
+  cadence:
+    definition: >
+      The policy governing the timing, frequency,
+      trigger conditions, and suspension conditions
+      of future Pulse events.
 
-cadence:
-definition: >
-The policy governing the timing, frequency,
-trigger conditions, and suspension conditions
-of future Pulse events.
+  adaptive_cadence:
+    definition: >
+      A cadence whose next Pulse timing or trigger mode
+      may change in response to current state,
+      risk, load, urgency, unresolved issues,
+      resource conditions, or safety policy.
 
-adaptive_cadence:
-definition: >
-A cadence whose next Pulse timing or trigger mode
-may change in response to current state,
-risk, load, urgency, unresolved issues,
-resource conditions, or safety policy.
+  cadence_decision:
+    definition: >
+      An explicit decision to accelerate, maintain,
+      decelerate, enter quiet mode, sleep, wake,
+      suspend autonomous Pulses, or escalate
+      to emergency cadence.
 
-cadence_decision:
-definition: >
-An explicit decision to accelerate, maintain,
-decelerate, enter quiet mode, sleep, wake,
-suspend autonomous Pulses, or escalate
-to emergency cadence.
+  pulse_interval:
+    definition: >
+      The planned temporal interval between the current Pulse
+      and the next scheduled Pulse.
 
-pulse_interval:
-definition: >
-The planned temporal interval between the current Pulse
-and the next scheduled Pulse.
+  event_driven_pulse:
+    definition: >
+      A Pulse triggered by a defined condition or event
+      rather than by fixed elapsed time.
 
-event_driven_pulse:
-definition: >
-A Pulse triggered by a defined condition or event
-rather than by fixed elapsed time.
+  cadence_hysteresis:
+    definition: >
+      A stabilization mechanism preventing rapid oscillation
+      between cadence modes due to minor fluctuations.
 
-cadence_hysteresis:
-definition: >
-A stabilization mechanism preventing rapid oscillation
-between cadence modes due to minor fluctuations.
-
-cadence_budget:
-definition: >
-A bounded allowance for Pulse frequency,
-computational cost, energy consumption,
-token use, or other resource expenditure.
+  cadence_budget:
+    definition: >
+      A bounded allowance for Pulse frequency,
+      computational cost, energy consumption,
+      token use, or other resource expenditure.
 
 cadence_modes:
+  quiet:
+    description: >
+      Low-frequency monitoring with minimal computation.
+    recommended_use:
+      - stable state
+      - low urgency
+      - low unresolvedness
+      - no active risk escalation
+      - resource conservation preferred
+    allowed_next_modes:
+      - normal
+      - active
+      - sleep
+      - suspended
 
-quiet:
-description: >
-Low-frequency monitoring with minimal computation.
+  normal:
+    description: >
+      Baseline operating cadence.
+    recommended_use:
+      - routine processing
+      - moderate task activity
+      - stable risk profile
+      - available resource budget
+    allowed_next_modes:
+      - quiet
+      - active
+      - critical
+      - sleep
+      - suspended
 
-```
-recommended_use:
-  - stable state
-  - low urgency
-  - low unresolvedness
-  - no active risk escalation
-  - resource conservation preferred
+  active:
+    description: >
+      Elevated Pulse frequency for ongoing reasoning,
+      planning, coordination, or unresolved tasks.
+    recommended_use:
+      - active goal pursuit
+      - unresolved transition chain
+      - multi-step planning
+      - temporary high attention demand
+    allowed_next_modes:
+      - normal
+      - quiet
+      - critical
+      - sleep
+      - suspended
 
-allowed_next_modes:
-  - normal
-  - active
-  - sleep
-  - suspended
-```
+  critical:
+    description: >
+      High-frequency evaluation under elevated risk
+      or urgent state conditions.
+    recommended_use:
+      - safety event
+      - severe state inconsistency
+      - high-impact action pending
+      - rapidly changing environment
+    requirements:
+      - safety_limit_ref
+      - maximum_duration
+      - exit_condition
+    allowed_next_modes:
+      - active
+      - normal
+      - suspended
 
-normal:
-description: >
-Baseline operating cadence.
+  sleep:
+    description: >
+      Long-interval or event-driven inactivity
+      preserving wake conditions.
+    recommended_use:
+      - no active task
+      - stable state
+      - low urgency
+      - resource conservation
+    requirements:
+      - wake_conditions
+    allowed_next_modes:
+      - quiet
+      - normal
+      - active
+      - critical
 
-```
-recommended_use:
-  - routine processing
-  - moderate task activity
-  - stable risk profile
-  - available resource budget
-
-allowed_next_modes:
-  - quiet
-  - active
-  - critical
-  - sleep
-  - suspended
-```
-
-active:
-description: >
-Elevated Pulse frequency for ongoing reasoning,
-planning, coordination, or unresolved tasks.
-
-```
-recommended_use:
-  - active goal pursuit
-  - unresolved transition chain
-  - multi-step planning
-  - temporary high attention demand
-
-allowed_next_modes:
-  - normal
-  - quiet
-  - critical
-  - sleep
-  - suspended
-```
-
-critical:
-description: >
-High-frequency evaluation under elevated risk
-or urgent state conditions.
-
-```
-recommended_use:
-  - safety event
-  - severe state inconsistency
-  - high-impact action pending
-  - rapidly changing environment
-
-requirements:
-  - safety_limit_ref
-  - maximum_duration
-  - exit_condition
-
-allowed_next_modes:
-  - active
-  - normal
-  - suspended
-```
-
-sleep:
-description: >
-Long-interval or event-driven inactivity
-preserving wake conditions.
-
-```
-recommended_use:
-  - no active task
-  - stable state
-  - low urgency
-  - resource conservation
-
-requirements:
-  - wake_conditions
-
-allowed_next_modes:
-  - quiet
-  - normal
-  - active
-  - critical
-```
-
-suspended:
-description: >
-Autonomous Pulse generation is disabled.
-
-```
-recommended_use:
-  - human intervention required
-  - unresolved safety conflict
-  - resource exhaustion
-  - policy prohibition
-  - system maintenance
-
-requirements:
-  - suspension_reason
-  - resume_authority
-
-allowed_next_modes:
-  - quiet
-  - normal
-  - active
-```
+  suspended:
+    description: >
+      Autonomous Pulse generation is disabled.
+    recommended_use:
+      - human intervention required
+      - unresolved safety conflict
+      - resource exhaustion
+      - policy prohibition
+      - system maintenance
+    requirements:
+      - suspension_reason
+      - resume_authority
+    allowed_next_modes:
+      - quiet
+      - normal
+      - active
 
 cadence_actions:
+  accelerate:
+    description: >
+      Reduce the interval to the next Pulse
+      or increase event sensitivity.
+    requirements:
+      - acceleration_reason
+      - target_mode
+      - budget_check
 
-accelerate:
-description: >
-Reduce the interval to the next Pulse
-or increase event sensitivity.
+  maintain:
+    description: >
+      Preserve the current cadence mode and policy.
+    requirements:
+      - retention_reason
 
-```
-requirements:
-  - acceleration_reason
-  - target_mode
-  - budget_check
-```
+  decelerate:
+    description: >
+      Increase the interval between Pulses
+      or reduce event sensitivity.
+    requirements:
+      - deceleration_reason
+      - target_mode
 
-maintain:
-description: >
-Preserve the current cadence mode and policy.
+  enter_quiet:
+    description: >
+      Shift to low-frequency monitoring.
 
-```
-requirements:
-  - retention_reason
-```
+  enter_sleep:
+    description: >
+      Shift from scheduled active evaluation
+      to long-interval or event-driven wake behavior.
+    requirements:
+      - wake_conditions
 
-decelerate:
-description: >
-Increase the interval between Pulses
-or reduce event sensitivity.
+  wake:
+    description: >
+      Reactivate Pulse generation from sleep.
+    requirements:
+      - wake_trigger
+      - state_validity_check
 
-```
-requirements:
-  - deceleration_reason
-  - target_mode
-```
+  suspend:
+    description: >
+      Disable autonomous Pulse generation.
+    requirements:
+      - suspension_reason
+      - resume_authority
 
-enter_quiet:
-description: >
-Shift to low-frequency monitoring.
-
-enter_sleep:
-description: >
-Shift from scheduled active evaluation
-to long-interval or event-driven wake behavior.
-
-```
-requirements:
-  - wake_conditions
-```
-
-wake:
-description: >
-Reactivate Pulse generation from sleep.
-
-```
-requirements:
-  - wake_trigger
-  - state_validity_check
-```
-
-suspend:
-description: >
-Disable autonomous Pulse generation.
-
-```
-requirements:
-  - suspension_reason
-  - resume_authority
-```
-
-emergency_escalate:
-description: >
-Enter bounded high-frequency evaluation
-for urgent or safety-critical conditions.
-
-```
-requirements:
-  - emergency_reason
-  - safety_limit_ref
-  - maximum_duration
-  - exit_condition
-```
+  emergency_escalate:
+    description: >
+      Enter bounded high-frequency evaluation
+      for urgent or safety-critical conditions.
+    requirements:
+      - emergency_reason
+      - safety_limit_ref
+      - maximum_duration
+      - exit_condition
 
 cadence_signal_model:
+  signals:
+    state_stability:
+      range:
+        minimum: 0.0
+        maximum: 1.0
+      interpretation: >
+        Higher values indicate greater state stability.
+      cadence_effect:
+        high: deceleration_bias
+        low: acceleration_bias
 
-signals:
+    risk_level:
+      allowed:
+        - negligible
+        - low
+        - moderate
+        - high
+        - critical
+      cadence_effect:
+        negligible: deceleration_bias
+        low: neutral
+        moderate: active_bias
+        high: acceleration_bias
+        critical: critical_mode_bias
 
-```
-state_stability:
-  range:
-    minimum: 0.0
-    maximum: 1.0
+    goal_urgency:
+      allowed:
+        - none
+        - low
+        - moderate
+        - high
+        - immediate
+      cadence_effect:
+        none: sleep_or_quiet_bias
+        low: quiet_bias
+        moderate: normal_bias
+        high: active_bias
+        immediate: critical_bias
 
-  interpretation: >
-    Higher values indicate greater state stability.
+    unresolvedness:
+      range:
+        minimum: 0.0
+        maximum: 1.0
+      interpretation: >
+        Degree to which important state questions,
+        transition conflicts, or action dependencies remain unresolved.
+      cadence_effect:
+        high: acceleration_bias
+        low: deceleration_bias
 
-  cadence_effect:
-    high: "deceleration_bias"
-    low: "acceleration_bias"
+    computational_load:
+      range:
+        minimum: 0.0
+        maximum: 1.0
+      cadence_effect:
+        high: deceleration_or_route_change_bias
+        low: neutral
 
+    resource_pressure:
+      allowed:
+        - none
+        - low
+        - moderate
+        - high
+        - exhausted
+      cadence_effect:
+        none: neutral
+        low: neutral
+        moderate: deceleration_bias
+        high: quiet_or_sleep_bias
+        exhausted: suspension_bias
 
-risk_level:
-  allowed:
-    - negligible
-    - low
-    - moderate
-    - high
-    - critical
+    external_event_pressure:
+      allowed:
+        - none
+        - low
+        - moderate
+        - high
+        - emergency
+      cadence_effect:
+        none: neutral
+        low: normal_bias
+        moderate: active_bias
+        high: acceleration_bias
+        emergency: critical_bias
 
-  cadence_effect:
-    negligible: "deceleration_bias"
-    low: "neutral"
-    moderate: "active_bias"
-    high: "acceleration_bias"
-    critical: "critical_mode_bias"
-
-
-goal_urgency:
-  allowed:
-    - none
-    - low
-    - moderate
-    - high
-    - immediate
-
-  cadence_effect:
-    none: "sleep_or_quiet_bias"
-    low: "quiet_bias"
-    moderate: "normal_bias"
-    high: "active_bias"
-    immediate: "critical_bias"
-
-
-unresolvedness:
-  range:
-    minimum: 0.0
-    maximum: 1.0
-
-  interpretation: >
-    Degree to which important state questions,
-    transition conflicts, or action dependencies remain unresolved.
-
-  cadence_effect:
-    high: "acceleration_bias"
-    low: "deceleration_bias"
-
-
-computational_load:
-  range:
-    minimum: 0.0
-    maximum: 1.0
-
-  cadence_effect:
-    high: "deceleration_or_route_change_bias"
-    low: "neutral"
-
-
-resource_pressure:
-  allowed:
-    - none
-    - low
-    - moderate
-    - high
-    - exhausted
-
-  cadence_effect:
-    none: "neutral"
-    low: "neutral"
-    moderate: "deceleration_bias"
-    high: "quiet_or_sleep_bias"
-    exhausted: "suspension_bias"
-
-
-external_event_pressure:
-  allowed:
-    - none
-    - low
-    - moderate
-    - high
-    - emergency
-
-  cadence_effect:
-    none: "neutral"
-    low: "normal_bias"
-    moderate: "active_bias"
-    high: "acceleration_bias"
-    emergency: "critical_bias"
-
-
-human_attention_requirement:
-  allowed:
-    - none
-    - optional
-    - recommended
-    - required
-
-  cadence_effect:
-    none: "neutral"
-    optional: "neutral"
-    recommended: "defer_or_slow_bias"
-    required: "suspension_or_human_gate_bias"
-```
+    human_attention_requirement:
+      allowed:
+        - none
+        - optional
+        - recommended
+        - required
+      cadence_effect:
+        none: neutral
+        optional: neutral
+        recommended: defer_or_slow_bias
+        required: suspension_or_human_gate_bias
 
 cadence_evaluation:
+  required_inputs:
+    - current_mode
+    - current_state_ref
+    - pulse_ref
+    - signal_snapshot
+    - resource_budget_ref
+    - applicable_policy_refs
 
-required_inputs:
-- current_mode
-- current_state_ref
-- pulse_ref
-- signal_snapshot
-- resource_budget_ref
-- applicable_policy_refs
+  evaluation_order:
+    step_1_safety:
+      description: >
+        Evaluate critical safety conditions first.
 
-evaluation_order:
+    step_2_human_gate:
+      description: >
+        Determine whether autonomous cadence remains permitted.
 
-```
-step_1_safety:
-  description: >
-    Evaluate critical safety conditions first.
+    step_3_resource_budget:
+      description: >
+        Confirm sufficient computation, energy,
+        token, or operational budget.
 
+    step_4_risk_and_urgency:
+      description: >
+        Evaluate risk, urgency, and external event pressure.
 
-step_2_human_gate:
-  description: >
-    Determine whether autonomous cadence remains permitted.
+    step_5_state_stability:
+      description: >
+        Evaluate stability and unresolvedness.
 
+    step_6_hysteresis:
+      description: >
+        Prevent unstable cadence oscillation.
 
-step_3_resource_budget:
-  description: >
-    Confirm sufficient computation, energy,
-    token, or operational budget.
-
-
-step_4_risk_and_urgency:
-  description: >
-    Evaluate risk, urgency, and external event pressure.
-
-
-step_5_state_stability:
-  description: >
-    Evaluate stability and unresolvedness.
-
-
-step_6_hysteresis:
-  description: >
-    Prevent unstable cadence oscillation.
-
-
-step_7_decision:
-  description: >
-    Select cadence action, target mode,
-    and next Pulse policy.
-```
+    step_7_decision:
+      description: >
+        Select cadence action, target mode,
+        and next Pulse policy.
 
 decision_priority:
+  order:
+    - safety_boundary
+    - human_gate
+    - resource_exhaustion
+    - critical_risk
+    - immediate_urgency
+    - unresolved_state
+    - active_goal
+    - state_stability
+    - resource_optimization
 
-order:
-- safety_boundary
-- human_gate
-- resource_exhaustion
-- critical_risk
-- immediate_urgency
-- unresolved_state
-- active_goal
-- state_stability
-- resource_optimization
-
-rule: >
-Lower-priority optimization signals MUST NOT override
-higher-priority safety or human-gate conditions.
+  rule: >
+    Lower-priority optimization signals MUST NOT override
+    higher-priority safety or human-gate conditions.
 
 next_pulse_policies:
+  fixed_interval:
+    description: >
+      Schedule the next Pulse after a defined duration.
+    required_fields:
+      - interval_seconds
 
-fixed_interval:
-description: >
-Schedule the next Pulse after a defined duration.
+  bounded_interval:
+    description: >
+      Schedule the next Pulse within an allowed time range.
+    required_fields:
+      - minimum_interval_seconds
+      - maximum_interval_seconds
 
-```
-required_fields:
-  - interval_seconds
-```
+  event_driven:
+    description: >
+      Wait until one or more defined events occur.
+    required_fields:
+      - wake_events
 
-bounded_interval:
-description: >
-Schedule the next Pulse within an allowed time range.
+  hybrid:
+    description: >
+      Trigger on either event occurrence
+      or maximum elapsed interval.
+    required_fields:
+      - maximum_interval_seconds
+      - wake_events
 
-```
-required_fields:
-  - minimum_interval_seconds
-  - maximum_interval_seconds
-```
-
-event_driven:
-description: >
-Wait until one or more defined events occur.
-
-```
-required_fields:
-  - wake_events
-```
-
-hybrid:
-description: >
-Trigger on either event occurrence
-or maximum elapsed interval.
-
-```
-required_fields:
-  - maximum_interval_seconds
-  - wake_events
-```
-
-suspended:
-description: >
-No autonomous next Pulse is permitted.
-
-```
-required_fields:
-  - resume_authority
-  - resume_conditions
-```
+  suspended:
+    description: >
+      No autonomous next Pulse is permitted.
+    required_fields:
+      - resume_authority
+      - resume_conditions
 
 hysteresis_policy:
+  purpose: >
+    Prevent rapid oscillation between cadence modes.
+  requirements:
+    - minimum_mode_duration
+    - transition_threshold
+    - cooldown_policy
+  rules:
+    minimum_mode_duration:
+      rule: >
+        A cadence mode SHOULD remain active for a minimum period
+        unless a higher-priority safety condition requires change.
 
-purpose: >
-Prevent rapid oscillation between cadence modes.
+    threshold_margin:
+      rule: >
+        Acceleration and deceleration thresholds SHOULD differ
+        to prevent boundary oscillation.
 
-requirements:
-- minimum_mode_duration
-- transition_threshold
-- cooldown_policy
+    repeated_flip_detection:
+      rule: >
+        Repeated mode changes within a defined window
+        MUST trigger cadence instability review.
 
-rules:
-
-```
-minimum_mode_duration:
-  rule: >
-    A cadence mode SHOULD remain active for a minimum period
-    unless a higher-priority safety condition requires change.
-
-
-threshold_margin:
-  rule: >
-    Acceleration and deceleration thresholds SHOULD differ
-    to prevent boundary oscillation.
-
-
-repeated_flip_detection:
-  rule: >
-    Repeated mode changes within a defined window
-    MUST trigger cadence instability review.
-
-
-emergency_override:
-  rule: >
-    Critical safety conditions MAY bypass
-    hysteresis restrictions.
-```
+    emergency_override:
+      rule: >
+        Critical safety conditions MAY bypass
+        hysteresis restrictions.
 
 cadence_budget_policy:
+  purpose: >
+    Prevent uncontrolled Pulse frequency
+    and computational exhaustion.
+  measurable_dimensions:
+    - pulse_count
+    - compute_time
+    - token_usage
+    - energy_estimate
+    - monetary_cost
+    - external_tool_calls
+  required_rules:
+    maximum_pulse_rate:
+      rule: >
+        A policy MAY define a maximum Pulse frequency.
 
-purpose: >
-Prevent uncontrolled Pulse frequency
-and computational exhaustion.
+    maximum_critical_duration:
+      rule: >
+        Critical mode MUST have bounded duration
+        or explicit renewal authorization.
 
-measurable_dimensions:
-- pulse_count
-- compute_time
-- token_usage
-- energy_estimate
-- monetary_cost
-- external_tool_calls
+    resource_exhaustion:
+      rule: >
+        Resource exhaustion MUST cause deceleration,
+        sleep, route change, or suspension.
 
-required_rules:
-
-```
-maximum_pulse_rate:
-  rule: >
-    A policy MAY define a maximum Pulse frequency.
-
-
-maximum_critical_duration:
-  rule: >
-    Critical mode MUST have bounded duration
-    or explicit renewal authorization.
-
-
-resource_exhaustion:
-  rule: >
-    Resource exhaustion MUST cause deceleration,
-    sleep, route change, or suspension.
-
-
-budget_override:
-  rule: >
-    Budget override MUST be explicitly authorized
-    and traceable.
-```
+    budget_override:
+      rule: >
+        Budget override MUST be explicitly authorized
+        and traceable.
 
 computational_pranayama_bridge:
+  purpose: >
+    Connect adaptive temporal cadence with computation pacing,
+    rest, reduction, routing, and return policies.
+  mappings:
+    inhale:
+      temporal_meaning: >
+        Acquire state, evidence, environmental input,
+        or unresolved task signals.
 
-purpose: >
-Connect adaptive temporal cadence with computation pacing,
-rest, reduction, routing, and return policies.
+    retention:
+      temporal_meaning: >
+        Maintain active internal state
+        without unnecessary action.
 
-mappings:
+    exhale:
+      temporal_meaning: >
+        Release computation pressure through completion,
+        Trace emission, route reduction, or state closure.
 
-```
-inhale:
-  temporal_meaning: >
-    Acquire state, evidence, environmental input,
-    or unresolved task signals.
+    pause:
+      temporal_meaning: >
+        Enter quiet, sleep, or suspended cadence.
 
+  rule: >
+    Cadence acceleration SHOULD NOT be the default response
+    to every unresolved state.
 
-retention:
-  temporal_meaning: >
-    Maintain active internal state
-    without unnecessary action.
-
-
-exhale:
-  temporal_meaning: >
-    Release computation pressure through completion,
-    Trace emission, route reduction, or state closure.
-
-
-pause:
-  temporal_meaning: >
-    Enter quiet, sleep, or suspended cadence.
-```
-
-rule: >
-Cadence acceleration SHOULD NOT be the default response
-to every unresolved state.
-
-balancing_rule: >
-The system SHOULD first evaluate whether additional computation
-is necessary, whether routing can be reduced,
-whether another agent can handle the task,
-or whether deliberate pause is preferable.
+  balancing_rule: >
+    The system SHOULD first evaluate whether additional computation
+    is necessary, whether routing can be reduced,
+    whether another agent can handle the task,
+    or whether deliberate pause is preferable.
 
 state_transition_binding:
+  purpose: >
+    Connect cadence decisions
+    to State Transition Rule outcomes.
+  transition_effects:
+    retain:
+      default_bias: maintain_or_decelerate
 
-purpose: >
-Connect cadence decisions
-to State Transition Rule outcomes.
+    advance:
+      default_bias: reevaluate_after_transition
 
-transition_effects:
+    branch:
+      default_bias: active
 
-```
-retain:
-  default_bias: "maintain_or_decelerate"
+    suspend:
+      required_mode: suspended
 
-advance:
-  default_bias: "reevaluate_after_transition"
+    resume:
+      default_bias: normal_or_active
 
-branch:
-  default_bias: "active"
+    supersede:
+      default_bias: reevaluate_after_transition
 
-suspend:
-  required_mode: "suspended"
+    reconcile:
+      default_bias: normal
 
-resume:
-  default_bias: "normal_or_active"
+    terminate:
+      required_mode: sleep_or_suspended
 
-supersede:
-  default_bias: "reevaluate_after_transition"
-
-reconcile:
-  default_bias: "normal"
-
-terminate:
-  required_mode: "sleep_or_suspended"
-```
-
-rule: >
-Transition type MAY influence cadence,
-but cadence decisions MUST still be evaluated
-under applicable safety and budget policies.
+  rule: >
+    Transition type MAY influence cadence,
+    but cadence decisions MUST still be evaluated
+    under applicable safety and budget policies.
 
 structural_precedence_binding:
-
-purpose: >
-Bind cadence decisions to causal direction.
-
-local_precedence:
-canonical_form: "State Evaluation -> Cadence Decision -> Next Pulse Policy"
-
-structural_precedence:
-canonical_form: "Cadence Policy -> Allowed Timing Space -> Next Pulse"
-
-ontological_precedence:
-canonical_form: "Foundational Operating Policy -> Cadence Governance -> Temporal Activity"
-
-rule: >
-A cadence decision MUST NOT claim a causal signal
-that was unavailable or structurally inapplicable
-when the decision was made.
+  purpose: >
+    Bind cadence decisions to causal direction.
+  local_precedence:
+    canonical_form: "State Evaluation -> Cadence Decision -> Next Pulse Policy"
+  structural_precedence:
+    canonical_form: "Cadence Policy -> Allowed Timing Space -> Next Pulse"
+  ontological_precedence:
+    canonical_form: "Foundational Operating Policy -> Cadence Governance -> Temporal Activity"
+  rule: >
+    A cadence decision MUST NOT claim a causal signal
+    that was unavailable or structurally inapplicable
+    when the decision was made.
 
 cadence_consistency_check:
+  id: "CCC"
+  name: "Cadence Consistency Check"
+  checks:
+    CCC_001_reason_binding:
+      severity: error
+      requirement: >
+        Every cadence mode change MUST identify
+        at least one causal signal or policy reference.
+      failure_code: UNEXPLAINED_CADENCE_CHANGE
 
-id: "CCC"
-name: "Cadence Consistency Check"
+    CCC_002_mode_transition_validity:
+      severity: error
+      requirement: >
+        Target cadence mode MUST be permitted
+        from the current mode.
+      failure_code: INVALID_CADENCE_TRANSITION
 
-checks:
+    CCC_003_safety_priority:
+      severity: error
+      requirement: >
+        Lower-priority optimization signals MUST NOT override
+        critical safety conditions.
+      failure_code: SAFETY_PRIORITY_VIOLATION
 
-```
-CCC_001_reason_binding:
-  severity: "error"
+    CCC_004_budget_compliance:
+      severity: error
+      requirement: >
+        Cadence decision MUST comply with the active resource budget
+        or include valid override authorization.
+      failure_code: CADENCE_BUDGET_VIOLATION
 
-  requirement: >
-    Every cadence mode change MUST identify
-    at least one causal signal or policy reference.
+    CCC_005_hysteresis_compliance:
+      severity: warning
+      requirement: >
+        Non-emergency cadence changes SHOULD comply
+        with hysteresis policy.
+      failure_code: CADENCE_OSCILLATION_RISK
 
-  failure_code: "UNEXPLAINED_CADENCE_CHANGE"
+    CCC_006_critical_duration:
+      severity: error
+      requirement: >
+        Critical mode MUST define maximum duration
+        and exit conditions.
+      failure_code: UNBOUNDED_CRITICAL_MODE
 
+    CCC_007_sleep_wake_integrity:
+      severity: error
+      requirement: >
+        Sleep mode MUST define valid wake conditions.
+      failure_code: MISSING_WAKE_CONDITION
 
-CCC_002_mode_transition_validity:
-  severity: "error"
+    CCC_008_suspension_authority:
+      severity: error
+      requirement: >
+        Suspended mode MUST define resume authority.
+      failure_code: UNCONTROLLED_SUSPENSION
 
-  requirement: >
-    Target cadence mode MUST be permitted
-    from the current mode.
+    CCC_009_signal_availability:
+      severity: error
+      requirement: >
+        Signals cited as cadence causes MUST have been available
+        at decision time.
+      failure_code: RETROACTIVE_CADENCE_JUSTIFICATION
 
-  failure_code: "INVALID_CADENCE_TRANSITION"
-
-
-CCC_003_safety_priority:
-  severity: "error"
-
-  requirement: >
-    Lower-priority optimization signals MUST NOT override
-    critical safety conditions.
-
-  failure_code: "SAFETY_PRIORITY_VIOLATION"
-
-
-CCC_004_budget_compliance:
-  severity: "error"
-
-  requirement: >
-    Cadence decision MUST comply with the active resource budget
-    or include valid override authorization.
-
-  failure_code: "CADENCE_BUDGET_VIOLATION"
-
-
-CCC_005_hysteresis_compliance:
-  severity: "warning"
-
-  requirement: >
-    Non-emergency cadence changes SHOULD comply
-    with hysteresis policy.
-
-  failure_code: "CADENCE_OSCILLATION_RISK"
-
-
-CCC_006_critical_duration:
-  severity: "error"
-
-  requirement: >
-    Critical mode MUST define maximum duration
-    and exit conditions.
-
-  failure_code: "UNBOUNDED_CRITICAL_MODE"
-
-
-CCC_007_sleep_wake_integrity:
-  severity: "error"
-
-  requirement: >
-    Sleep mode MUST define valid wake conditions.
-
-  failure_code: "MISSING_WAKE_CONDITION"
-
-
-CCC_008_suspension_authority:
-  severity: "error"
-
-  requirement: >
-    Suspended mode MUST define resume authority.
-
-  failure_code: "UNCONTROLLED_SUSPENSION"
-
-
-CCC_009_signal_availability:
-  severity: "error"
-
-  requirement: >
-    Signals cited as cadence causes MUST have been available
-    at decision time.
-
-  failure_code: "RETROACTIVE_CADENCE_JUSTIFICATION"
-
-
-CCC_010_pulse_storm_detection:
-  severity: "warning"
-
-  requirement: >
-    Repeated rapid Pulse generation MUST trigger
-    budget and stability review.
-
-  failure_code: "PULSE_STORM"
-```
+    CCC_010_pulse_storm_detection:
+      severity: warning
+      requirement: >
+        Repeated rapid Pulse generation MUST trigger
+        budget and stability review.
+      failure_code: PULSE_STORM
 
 failure_modes:
+  pulse_storm:
+    description: >
+      Pulse frequency increases recursively,
+      creating uncontrolled repeated evaluation
+      without proportional state progress.
+    symptoms:
+      - rapidly decreasing Pulse intervals
+      - repeated evaluations with unchanged state
+      - growing compute cost
+      - unresolvedness remaining constant
+    mitigation:
+      - pulse_rate_limit
+      - transition_progress_check
+      - cadence_cooldown
+      - computational_pranayama_reduction
+      - human_review
 
-pulse_storm:
-description: >
-Pulse frequency increases recursively,
-creating uncontrolled repeated evaluation
-without proportional state progress.
+  cadence_lock:
+    description: >
+      The system becomes trapped in one cadence mode
+      despite materially changed conditions.
+    symptoms:
+      - permanent active mode
+      - permanent quiet mode
+      - failure_to_wake
+      - failure_to_decelerate_after_task_completion
+    mitigation:
+      - periodic_cadence_policy_audit
+      - mode_expiration
+      - external_wake_event
+      - safety_override
 
-```
-symptoms:
-  - rapidly decreasing Pulse intervals
-  - repeated evaluations with unchanged state
-  - growing compute cost
-  - unresolvedness remaining constant
+  cadence_oscillation:
+    description: >
+      The system repeatedly switches between faster
+      and slower cadence modes due to unstable thresholds.
+    symptoms:
+      - active_quiet_flipping
+      - repeated_accelerate_decelerate_decisions
+      - high_transition_count_with_low_progress
+    mitigation:
+      - hysteresis_margin
+      - minimum_mode_duration
+      - cooldown_period
+      - signal_smoothing
 
-mitigation:
-  - pulse rate limit
-  - transition progress check
-  - cadence cooldown
-  - Computational Pranayama reduction
-  - human review
-```
+  false_urgency:
+    description: >
+      Non-critical unresolved states are repeatedly interpreted
+      as emergencies.
+    symptoms:
+      - excessive_critical_mode_activation
+      - routine_tasks_receiving_emergency_cadence
+      - budget_exhaustion
+    mitigation:
+      - urgency_evidence_requirement
+      - critical_mode_duration_limit
+      - independent_safety_verification
 
-cadence_lock:
-description: >
-The system becomes trapped in one cadence mode
-despite materially changed conditions.
+  temporal_starvation:
+    description: >
+      Important states receive insufficient Pulse opportunities.
+    symptoms:
+      - unresolved_high_risk_issue_remains_dormant
+      - wake_conditions_never_trigger
+      - goal_deadline_passes_without_evaluation
+    mitigation:
+      - maximum_silence_interval
+      - hybrid_time_event_policy
+      - unresolvedness_threshold_wake
+      - watchdog_audit
 
-```
-symptoms:
-  - permanent active mode
-  - permanent quiet mode
-  - failure to wake
-  - failure to decelerate after task completion
+  sleep_without_wake:
+    description: >
+      The system enters sleep mode without valid wake conditions.
+    mitigation:
+      - mandatory_wake_conditions
+      - fallback_maximum_interval
+      - external_recovery_trigger
 
-mitigation:
-  - periodic cadence policy audit
-  - mode expiration
-  - external wake event
-  - safety override
-```
+  critical_mode_exhaustion:
+    description: >
+      Critical cadence continues until computational
+      or operational resources are exhausted.
+    mitigation:
+      - maximum_duration
+      - renewal_authorization
+      - forced_de_escalation
+      - route_delegation
+      - human_gate
 
-cadence_oscillation:
-description: >
-The system repeatedly switches between faster
-and slower cadence modes due to unstable thresholds.
+  resource_blind_acceleration:
+    description: >
+      Cadence accelerates without considering
+      compute, energy, token, or monetary constraints.
+    mitigation:
+      - mandatory_budget_check
+      - compute_pressure_signal
+      - alternative_route_evaluation
+      - computational_pranayama_bridge
 
-```
-symptoms:
-  - active/quiet flipping
-  - repeated accelerate/decelerate decisions
-  - high transition count with low progress
-
-mitigation:
-  - hysteresis margin
-  - minimum mode duration
-  - cooldown period
-  - signal smoothing
-```
-
-false_urgency:
-description: >
-Non-critical unresolved states are repeatedly interpreted
-as emergencies.
-
-```
-symptoms:
-  - excessive critical mode activation
-  - routine tasks receiving emergency cadence
-  - budget exhaustion
-
-mitigation:
-  - urgency evidence requirement
-  - critical mode duration limit
-  - independent safety verification
-```
-
-temporal_starvation:
-description: >
-Important states receive insufficient Pulse opportunities.
-
-```
-symptoms:
-  - unresolved high-risk issue remains dormant
-  - wake conditions never trigger
-  - goal deadline passes without evaluation
-
-mitigation:
-  - maximum silence interval
-  - hybrid time/event policy
-  - unresolvedness threshold wake
-  - watchdog audit
-```
-
-sleep_without_wake:
-description: >
-The system enters sleep mode without valid wake conditions.
-
-```
-mitigation:
-  - mandatory wake_conditions
-  - fallback maximum interval
-  - external recovery trigger
-```
-
-critical_mode_exhaustion:
-description: >
-Critical cadence continues until computational
-or operational resources are exhausted.
-
-```
-mitigation:
-  - maximum duration
-  - renewal authorization
-  - forced de-escalation
-  - route delegation
-  - human gate
-```
-
-resource_blind_acceleration:
-description: >
-Cadence accelerates without considering
-compute, energy, token, or monetary constraints.
-
-```
-mitigation:
-  - mandatory budget check
-  - compute pressure signal
-  - alternative route evaluation
-  - Computational Pranayama bridge
-```
-
-retroactive_cadence_justification:
-description: >
-A cadence change is explained using information
-that became available only after the decision.
-
-```
-mitigation:
-  - decision-time signal snapshot
-  - immutable cadence record
-  - retrospective inference labeling
-```
+  retroactive_cadence_justification:
+    description: >
+      A cadence change is explained using information
+      that became available only after the decision.
+    mitigation:
+      - decision_time_signal_snapshot
+      - immutable_cadence_record
+      - retrospective_inference_labeling
 
 safety_requirements:
+  SR_001:
+    rule: >
+      Critical cadence MUST be bounded.
 
-SR_001:
-rule: >
-Critical cadence MUST be bounded.
+  SR_002:
+    rule: >
+      Human-review-required states MUST NOT autonomously accelerate
+      past applicable human gates.
 
-SR_002:
-rule: >
-Human-review-required states MUST NOT autonomously accelerate
-past applicable human gates.
+  SR_003:
+    rule: >
+      Resource exhaustion MUST NOT be answered solely
+      by continued cadence acceleration.
 
-SR_003:
-rule: >
-Resource exhaustion MUST NOT be answered solely
-by continued cadence acceleration.
+  SR_004:
+    rule: >
+      Suspended cadence MUST preserve explicit resume authority.
 
-SR_004:
-rule: >
-Suspended cadence MUST preserve explicit resume authority.
-
-SR_005:
-rule: >
-Cadence policy failures affecting high-impact actions
-MUST be traceable to downstream audit systems.
+  SR_005:
+    rule: >
+      Cadence policy failures affecting high-impact actions
+      MUST be traceable to downstream audit systems.
 
 integration:
+  pulse_record:
+    relation: >
+      Cadence decisions determine the scheduling
+      or triggering policy for future Pulse Records.
 
-pulse_record:
-relation: >
-Cadence decisions determine the scheduling
-or triggering policy for future Pulse Records.
+  state_transition_rule:
+    relation: >
+      Transition outcomes provide major signals
+      for cadence reevaluation.
 
-state_transition_rule:
-relation: >
-Transition outcomes provide major signals
-for cadence reevaluation.
+  structural_precedence_core:
+    relation: >
+      Structural Precedence records why a cadence decision
+      was causally justified.
 
-structural_precedence_core:
-relation: >
-Structural Precedence records why a cadence decision
-was causally justified.
+  computational_pranayama_protocol:
+    relation: >
+      Supplies computation pacing, rest, reduction,
+      routing, and pressure-release policies.
 
-computational_pranayama_protocol:
-relation: >
-Supplies computation pacing, rest, reduction,
-routing, and pressure-release policies.
+  future_temporal_causality_binding:
+    relation: >
+      Cadence decisions will be connected to downstream action
+      and causal evidence chains.
 
-future_temporal_causality_binding:
-relation: >
-Cadence decisions will be connected to downstream action
-and causal evidence chains.
-
-future_trace_audit_bridge:
-relation: >
-Cadence decisions and failures will be exported
-to Trace and Audit layers.
+  future_trace_audit_bridge:
+    relation: >
+      Cadence decisions and failures will be exported
+      to Trace and Audit layers.
 
 final_principle: >
-A temporal agent should not evaluate continuously
-merely because continuous evaluation is possible.
+  A temporal agent should not evaluate continuously
+  merely because continuous evaluation is possible.
 
-Adaptive cadence means deciding when to think,
-when to wait, when to accelerate,
-when to breathe, and when to stop.
+  Adaptive cadence means deciding when to think,
+  when to wait, when to accelerate,
+  when to breathe, and when to stop.
+
 
