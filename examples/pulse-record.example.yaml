@@ -1,0 +1,78 @@
+schema_version: "0.1.0"
+
+pulse:
+  pulse_id: "pulse-0001"
+  agent_id: "agent-alpha"
+  sequence_number: 1
+  observed_at: "2026-07-08T03:30:00Z"
+
+  trigger:
+    type: "external_input"
+    reference: "question-temporal-causality-0001"
+    description: >
+      A question about whether AI agents can maintain
+      dynamically evolving internal states.
+
+  previous_state_ref: "state-0000"
+
+  evaluation:
+    result: "transition"
+    reason: >
+      The current state does not contain a sufficient temporal
+      causality model and requires structural expansion.
+    evaluation_ref: "evaluation-0001"
+
+  transition:
+    transition_id: "transition-0001"
+    from_state_ref: "state-0000"
+    to_state_ref: "state-0001"
+
+    cause_refs:
+      - "question-temporal-causality-0001"
+      - "evaluation-0001"
+
+    rule_refs:
+      - "structural-precedence-core"
+
+  cadence:
+    mode: "active"
+    next_pulse_policy: "evaluate_after_structural_update"
+    reason: >
+      Active analysis should continue until the temporal
+      precedence model reaches a stable candidate state.
+
+  precedence_claims:
+
+    - claim_id: "precedence-local-0001"
+      precedence_level: "local"
+      predecessor_ref: "state-0000"
+      successor_ref: "state-0001"
+      relation_type: "transitions_to"
+      assertion_mode: "runtime_observed"
+      evidence_refs:
+        - "evaluation-0001"
+        - "transition-0001"
+      confidence: 1.0
+
+    - claim_id: "precedence-structural-0001"
+      precedence_level: "structural"
+      predecessor_ref: "structural-precedence-core"
+      successor_ref: "transition-0001"
+      relation_type: "enables"
+      assertion_mode: "policy_declared"
+      evidence_refs:
+        - "structural-precedence-core"
+      confidence: 1.0
+
+    - claim_id: "precedence-ontological-0001"
+      precedence_level: "ontological"
+      predecessor_ref: "origin-question-0001"
+      successor_ref: "state-0001"
+      relation_type: "made_possible_by"
+      assertion_mode: "retrospective_inference"
+      evidence_refs:
+        - "origin-trace-0001"
+      confidence: 0.85
+
+  trace_refs:
+    - "trace-temporal-state-0001"
