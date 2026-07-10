@@ -113,7 +113,7 @@ transition_decision_types:
       Create two or more explicit successor states
       from a common predecessor.
 
-    canonical_form: >
+    canonical_form: |2
                -> State B1
       State A
                -> State B2
