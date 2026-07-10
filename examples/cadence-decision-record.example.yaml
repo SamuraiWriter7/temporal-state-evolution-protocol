@@ -1,0 +1,139 @@
+schema_version: "0.3.0"
+
+cadence_decision:
+
+  decision_id: "cadence-decision-0003"
+
+  agent_id: "agent-alpha"
+
+  decided_at: "2026-07-10T01:00:00Z"
+
+  pulse_ref: "pulse-0003"
+
+  current_state_ref: "state-0002"
+
+  transition_ref: "transition-0002"
+
+  current_mode: "active"
+
+  signal_snapshot:
+
+    state_stability: 0.82
+
+    risk_level: "low"
+
+    goal_urgency: "moderate"
+
+    unresolvedness: 0.35
+
+    computational_load: 0.74
+
+    resource_pressure: "moderate"
+
+    external_event_pressure: "low"
+
+    human_attention_requirement: "none"
+
+    signal_evidence_refs:
+      - "state-evaluation-0003"
+      - "compute-pressure-record-0003"
+      - "goal-status-record-0003"
+
+  decision:
+
+    action: "decelerate"
+
+    target_mode: "normal"
+
+    reason: >
+      The current state is relatively stable,
+      unresolvedness has decreased,
+      risk remains low,
+      and computational load is elevated.
+      Continued high-frequency Pulse activity
+      is no longer justified.
+
+    policy_refs:
+      - "adaptive-cadence-policy"
+      - "computational-pranayama-protocol"
+
+  next_pulse_policy:
+
+    type: "hybrid"
+
+    maximum_interval_seconds: 900
+
+    wake_events:
+      - "risk_level_increase"
+      - "new_external_input"
+      - "state_threshold_crossed"
+      - "human_request"
+
+  budget_evaluation:
+
+    budget_ref: "cadence-budget-agent-alpha"
+
+    status: "within_budget"
+
+  hysteresis_evaluation:
+
+    result: "pass"
+
+    policy_ref: "cadence-hysteresis-default"
+
+  precedence_claims:
+
+    - claim_id: "precedence-cadence-local-0003"
+
+      precedence_level: "local"
+
+      predecessor_ref: "state-evaluation-0003"
+
+      successor_ref: "cadence-decision-0003"
+
+      relation_type: "causes"
+
+      assertion_mode: "runtime_observed"
+
+      evidence_refs:
+        - "state-evaluation-0003"
+        - "compute-pressure-record-0003"
+
+      confidence: 0.94
+
+    - claim_id: "precedence-cadence-structural-0003"
+
+      precedence_level: "structural"
+
+      predecessor_ref: "adaptive-cadence-policy"
+
+      successor_ref: "cadence-decision-0003"
+
+      relation_type: "authorizes"
+
+      assertion_mode: "policy_declared"
+
+      evidence_refs:
+        - "adaptive-cadence-policy"
+
+      confidence: 1.0
+
+    - claim_id: "precedence-pranayama-structural-0003"
+
+      precedence_level: "structural"
+
+      predecessor_ref: "computational-pranayama-protocol"
+
+      successor_ref: "cadence-decision-0003"
+
+      relation_type: "conditions"
+
+      assertion_mode: "policy_declared"
+
+      evidence_refs:
+        - "computational-pranayama-protocol"
+
+      confidence: 1.0
+
+  trace_refs:
+    - "trace-cadence-decision-0003"
