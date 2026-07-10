@@ -1,26 +1,26 @@
 schema_version: "0.3.0"
 
 specification:
-id: "adaptive-cadence-policy"
-name: "Adaptive Cadence Policy"
-short_name: "ACP"
-status: "candidate"
+  id: "adaptive-cadence-policy"
+  name: "Adaptive Cadence Policy"
+  short_name: "ACP"
+  status: "candidate"
 
-purpose: >
-Define how an AI agent or temporal system determines
-when its next Pulse should occur based on state,
-risk, load, urgency, unresolved issues, resource conditions,
-safety constraints, and external events.
+  purpose: >
+    Define how an AI agent or temporal system determines
+    when its next Pulse should occur based on state,
+    risk, load, urgency, unresolved issues, resource conditions,
+    safety constraints, and external events.
 
-core_principle: >
-Pulse frequency SHOULD respond to meaningful state conditions.
-A temporal agent SHOULD NOT remain permanently active,
-permanently dormant, or locked to a single fixed cadence
-when conditions materially change.
+  core_principle: >
+    Pulse frequency SHOULD respond to meaningful state conditions.
+    A temporal agent SHOULD NOT remain permanently active,
+    permanently dormant, or locked to a single fixed cadence
+    when conditions materially change.
 
-normative_rule: >
-Every cadence change MUST identify the state,
-event, evaluation, policy, or constraint that caused it.
+  normative_rule: >
+    Every cadence change MUST identify the state,
+    event, evaluation, policy, or constraint that caused it.
 
 definitions:
 
