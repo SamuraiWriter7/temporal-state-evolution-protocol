@@ -1,676 +1,1005 @@
-schema_version: "0.2.0"
+schema_version: "0.3.0"
 
 specification:
-  id: "state-transition-rule"
-  name: "State Transition Rule"
-  short_name: "STR"
-  status: "candidate"
+id: "adaptive-cadence-policy"
+name: "Adaptive Cadence Policy"
+short_name: "ACP"
+status: "candidate"
 
-  purpose: >
-    Define the rules by which a temporal agent state may be
-    retained, advanced, branched, suspended, resumed,
-    superseded, reconciled, or terminated.
+purpose: >
+Define how an AI agent or temporal system determines
+when its next Pulse should occur based on state,
+risk, load, urgency, unresolved issues, resource conditions,
+safety constraints, and external events.
 
-  core_principle: >
-    A state transition is not merely a change in stored values.
-    It is a directionally justified transformation from one
-    versioned state condition into another.
+core_principle: >
+Pulse frequency SHOULD respond to meaningful state conditions.
+A temporal agent SHOULD NOT remain permanently active,
+permanently dormant, or locked to a single fixed cadence
+when conditions materially change.
 
-  normative_rule: >
-    Every state-changing transition MUST identify its predecessor,
-    transition reason, applicable rule, authorization result,
-    and resulting state lineage.
+normative_rule: >
+Every cadence change MUST identify the state,
+event, evaluation, policy, or constraint that caused it.
 
 definitions:
 
-  state:
-    definition: >
-      A versioned representation of an agent or system condition
-      at a defined point in its temporal lineage.
+cadence:
+definition: >
+The policy governing the timing, frequency,
+trigger conditions, and suspension conditions
+of future Pulse events.
 
-    required_properties:
-      - state_id
-      - state_version
-      - lineage_id
-      - lifecycle_status
-      - valid_from
-      - predecessor_refs
+adaptive_cadence:
+definition: >
+A cadence whose next Pulse timing or trigger mode
+may change in response to current state,
+risk, load, urgency, unresolved issues,
+resource conditions, or safety policy.
 
-    historical_rule: >
-      Published historical states MUST NOT be silently overwritten.
+cadence_decision:
+definition: >
+An explicit decision to accelerate, maintain,
+decelerate, enter quiet mode, sleep, wake,
+suspend autonomous Pulses, or escalate
+to emergency cadence.
 
-  transition:
-    definition: >
-      An explicit directed relation between a source state
-      and a resulting state condition.
+pulse_interval:
+definition: >
+The planned temporal interval between the current Pulse
+and the next scheduled Pulse.
 
-    canonical_form: >
-      Source State
-      -> Evaluation
-      -> Transition Decision
-      -> Authorization
-      -> Resulting State
+event_driven_pulse:
+definition: >
+A Pulse triggered by a defined condition or event
+rather than by fixed elapsed time.
 
-  transition_proposal:
-    definition: >
-      A request to alter, retain, branch, suspend, resume,
-      supersede, reconcile, or terminate the active state.
+cadence_hysteresis:
+definition: >
+A stabilization mechanism preventing rapid oscillation
+between cadence modes due to minor fluctuations.
 
-    rule: >
-      A proposal MUST be evaluated before becoming
-      an accepted transition.
+cadence_budget:
+definition: >
+A bounded allowance for Pulse frequency,
+computational cost, energy consumption,
+token use, or other resource expenditure.
 
-  transition_guard:
-    definition: >
-      A condition that must be satisfied before a proposed
-      transition may be executed.
+cadence_modes:
 
-    examples:
-      - required evidence exists
-      - safety boundary is satisfied
-      - human review is complete
-      - predecessor state remains active
-      - resource budget is sufficient
-      - structural prerequisite resolves
+quiet:
+description: >
+Low-frequency monitoring with minimal computation.
 
-  state_lineage:
-    definition: >
-      A versioned history connecting predecessor states,
-      transitions, branches, reconciliation events,
-      and successor states.
+```
+recommended_use:
+  - stable state
+  - low urgency
+  - low unresolvedness
+  - no active risk escalation
+  - resource conservation preferred
 
-transition_decision_types:
+allowed_next_modes:
+  - normal
+  - active
+  - sleep
+  - suspended
+```
 
-  retain:
-    description: >
-      Preserve the current active state without creating
-      a semantically changed successor state.
+normal:
+description: >
+Baseline operating cadence.
 
-    required_reason: true
+```
+recommended_use:
+  - routine processing
+  - moderate task activity
+  - stable risk profile
+  - available resource budget
 
-    use_when:
-      - evaluation does not justify change
-      - evidence remains insufficient
-      - current state remains valid
-      - transition risk exceeds permitted threshold
+allowed_next_modes:
+  - quiet
+  - active
+  - critical
+  - sleep
+  - suspended
+```
 
-  advance:
-    description: >
-      Create a direct successor state in the same lineage.
+active:
+description: >
+Elevated Pulse frequency for ongoing reasoning,
+planning, coordination, or unresolved tasks.
 
-    canonical_form: >
-      State A -> State B
+```
+recommended_use:
+  - active goal pursuit
+  - unresolved transition chain
+  - multi-step planning
+  - temporary high attention demand
 
-    requirements:
-      - source state exists
-      - transition reason exists
-      - preconditions pass
-      - guards pass
-      - authorization succeeds
+allowed_next_modes:
+  - normal
+  - quiet
+  - critical
+  - sleep
+  - suspended
+```
 
-  branch:
-    description: >
-      Create two or more explicit successor states
-      from a common predecessor.
+critical:
+description: >
+High-frequency evaluation under elevated risk
+or urgent state conditions.
 
-    canonical_form: |2
-               -> State B1
-      State A
-               -> State B2
+```
+recommended_use:
+  - safety event
+  - severe state inconsistency
+  - high-impact action pending
+  - rapidly changing environment
 
-    requirements:
-      - branch_id
-      - branch_reason
-      - common_predecessor_ref
-      - branch_policy
+requirements:
+  - safety_limit_ref
+  - maximum_duration
+  - exit_condition
 
-    rule: >
-      Branching MUST NOT create multiple unlabeled current states.
+allowed_next_modes:
+  - active
+  - normal
+  - suspended
+```
 
-  suspend:
-    description: >
-      Place an active state into a non-progressing condition
-      while preserving the possibility of later continuation.
+sleep:
+description: >
+Long-interval or event-driven inactivity
+preserving wake conditions.
 
-    requirements:
-      - suspension_reason
-      - resume_condition
+```
+recommended_use:
+  - no active task
+  - stable state
+  - low urgency
+  - resource conservation
 
-  resume:
-    description: >
-      Reactivate a previously suspended state or lineage.
+requirements:
+  - wake_conditions
 
-    requirements:
-      - suspended_state_ref
-      - resume_trigger
-      - state_validity_check
+allowed_next_modes:
+  - quiet
+  - normal
+  - active
+  - critical
+```
 
-  supersede:
-    description: >
-      Declare that a newer state version replaces a prior state
-      for future processing without deleting historical records.
+suspended:
+description: >
+Autonomous Pulse generation is disabled.
 
-    rule: >
-      Supersession MUST preserve the superseded state
-      as immutable historical evidence.
+```
+recommended_use:
+  - human intervention required
+  - unresolved safety conflict
+  - resource exhaustion
+  - policy prohibition
+  - system maintenance
 
-  reconcile:
-    description: >
-      Merge or resolve compatible information from explicit
-      state branches into a new successor state.
+requirements:
+  - suspension_reason
+  - resume_authority
 
-    canonical_form: >
-      State B1 ----\
-                    -> State C
-      State B2 ----/
+allowed_next_modes:
+  - quiet
+  - normal
+  - active
+```
 
-    requirements:
-      - source_branch_refs
-      - reconciliation_policy
-      - conflict_resolution_result
-      - evidence_refs
+cadence_actions:
 
-  terminate:
-    description: >
-      End a state lineage or agent activity path.
+accelerate:
+description: >
+Reduce the interval to the next Pulse
+or increase event sensitivity.
 
-    requirements:
-      - termination_reason
-      - final_trace_ref
-      - unresolved_issue_status
+```
+requirements:
+  - acceleration_reason
+  - target_mode
+  - budget_check
+```
 
-state_lifecycle_statuses:
+maintain:
+description: >
+Preserve the current cadence mode and policy.
 
+```
+requirements:
+  - retention_reason
+```
+
+decelerate:
+description: >
+Increase the interval between Pulses
+or reduce event sensitivity.
+
+```
+requirements:
+  - deceleration_reason
+  - target_mode
+```
+
+enter_quiet:
+description: >
+Shift to low-frequency monitoring.
+
+enter_sleep:
+description: >
+Shift from scheduled active evaluation
+to long-interval or event-driven wake behavior.
+
+```
+requirements:
+  - wake_conditions
+```
+
+wake:
+description: >
+Reactivate Pulse generation from sleep.
+
+```
+requirements:
+  - wake_trigger
+  - state_validity_check
+```
+
+suspend:
+description: >
+Disable autonomous Pulse generation.
+
+```
+requirements:
+  - suspension_reason
+  - resume_authority
+```
+
+emergency_escalate:
+description: >
+Enter bounded high-frequency evaluation
+for urgent or safety-critical conditions.
+
+```
+requirements:
+  - emergency_reason
+  - safety_limit_ref
+  - maximum_duration
+  - exit_condition
+```
+
+cadence_signal_model:
+
+signals:
+
+```
+state_stability:
+  range:
+    minimum: 0.0
+    maximum: 1.0
+
+  interpretation: >
+    Higher values indicate greater state stability.
+
+  cadence_effect:
+    high: "deceleration_bias"
+    low: "acceleration_bias"
+
+
+risk_level:
   allowed:
-    - proposed
-    - active
-    - retained
-    - branched
-    - suspended
-    - superseded
-    - reconciled
-    - terminated
-    - quarantined
+    - negligible
+    - low
+    - moderate
+    - high
+    - critical
 
-  transition_constraints:
+  cadence_effect:
+    negligible: "deceleration_bias"
+    low: "neutral"
+    moderate: "active_bias"
+    high: "acceleration_bias"
+    critical: "critical_mode_bias"
 
-    proposed:
-      allowed_next:
-        - active
-        - quarantined
-        - terminated
 
-    active:
-      allowed_next:
-        - retained
-        - branched
-        - suspended
-        - superseded
-        - reconciled
-        - terminated
-        - quarantined
+goal_urgency:
+  allowed:
+    - none
+    - low
+    - moderate
+    - high
+    - immediate
 
-    retained:
-      allowed_next:
-        - active
-        - suspended
-        - terminated
+  cadence_effect:
+    none: "sleep_or_quiet_bias"
+    low: "quiet_bias"
+    moderate: "normal_bias"
+    high: "active_bias"
+    immediate: "critical_bias"
 
-    branched:
-      allowed_next:
-        - reconciled
-        - terminated
 
-    suspended:
-      allowed_next:
-        - active
-        - terminated
-        - quarantined
+unresolvedness:
+  range:
+    minimum: 0.0
+    maximum: 1.0
 
-    superseded:
-      allowed_next:
-        - terminated
+  interpretation: >
+    Degree to which important state questions,
+    transition conflicts, or action dependencies remain unresolved.
 
-    reconciled:
-      allowed_next:
-        - active
-        - suspended
-        - terminated
+  cadence_effect:
+    high: "acceleration_bias"
+    low: "deceleration_bias"
 
-    terminated:
-      allowed_next: []
 
-    quarantined:
-      allowed_next:
-        - active
-        - terminated
+computational_load:
+  range:
+    minimum: 0.0
+    maximum: 1.0
 
-transition_pipeline:
+  cadence_effect:
+    high: "deceleration_or_route_change_bias"
+    low: "neutral"
 
-  stages:
 
-    stage_1_proposal:
-      description: >
-        Declare the proposed transition type and intended successor.
+resource_pressure:
+  allowed:
+    - none
+    - low
+    - moderate
+    - high
+    - exhausted
 
-      required:
-        - proposal_id
-        - requested_transition_type
-        - source_state_ref
-        - reason
+  cadence_effect:
+    none: "neutral"
+    low: "neutral"
+    moderate: "deceleration_bias"
+    high: "quiet_or_sleep_bias"
+    exhausted: "suspension_bias"
 
-    stage_2_precondition_check:
-      description: >
-        Verify that required structural, temporal,
-        evidential, and policy prerequisites exist.
 
-      check_categories:
-        - temporal
-        - structural
-        - evidential
-        - authorization
-        - resource
-        - safety
+external_event_pressure:
+  allowed:
+    - none
+    - low
+    - moderate
+    - high
+    - emergency
 
-    stage_3_guard_evaluation:
-      description: >
-        Evaluate transition-specific blocking and permitting conditions.
+  cadence_effect:
+    none: "neutral"
+    low: "normal_bias"
+    moderate: "active_bias"
+    high: "acceleration_bias"
+    emergency: "critical_bias"
 
-      allowed_results:
-        - pass
-        - fail
-        - defer
-        - human_review_required
 
-    stage_4_authorization:
-      description: >
-        Determine whether the transition may execute.
+human_attention_requirement:
+  allowed:
+    - none
+    - optional
+    - recommended
+    - required
 
-      allowed_authorizers:
-        - agent_policy
-        - orchestration_policy
-        - safety_governor
-        - human_reviewer
-        - multi_wing_consensus
-        - system_recovery_policy
+  cadence_effect:
+    none: "neutral"
+    optional: "neutral"
+    recommended: "defer_or_slow_bias"
+    required: "suspension_or_human_gate_bias"
+```
 
-    stage_5_execution:
-      description: >
-        Create or update the resulting state lineage records.
+cadence_evaluation:
 
-    stage_6_trace_binding:
-      description: >
-        Bind the accepted or rejected transition decision
-        to a trace record.
+required_inputs:
+- current_mode
+- current_state_ref
+- pulse_ref
+- signal_snapshot
+- resource_budget_ref
+- applicable_policy_refs
 
-transition_preconditions:
+evaluation_order:
 
-  temporal_continuity:
-    requirement: >
-      Source state MUST belong to a valid lineage
-      and MUST resolve as an eligible predecessor.
+```
+step_1_safety:
+  description: >
+    Evaluate critical safety conditions first.
 
-  predecessor_validity:
-    requirement: >
-      The referenced predecessor state MUST exist
-      and MUST NOT be silently replaced.
 
-  structural_prerequisite:
-    requirement: >
-      Required structural precedence dependencies MUST resolve.
+step_2_human_gate:
+  description: >
+    Determine whether autonomous cadence remains permitted.
 
-  evidence_sufficiency:
-    requirement: >
-      Evidence required by the applicable transition rule
-      MUST be available or explicitly marked unresolved.
 
-  authorization_availability:
-    requirement: >
-      Required authorization authority MUST be available.
+step_3_resource_budget:
+  description: >
+    Confirm sufficient computation, energy,
+    token, or operational budget.
 
-  safety_boundary:
-    requirement: >
-      A transition MUST NOT bypass applicable safety,
-      permission, or human-gate requirements.
 
-transition_guards:
+step_4_risk_and_urgency:
+  description: >
+    Evaluate risk, urgency, and external event pressure.
 
-  source_state_guard:
-    blocks_when:
-      - source state does not exist
-      - source lineage is invalid
-      - source state is terminated
-      - source state reference is ambiguous
 
-  evidence_guard:
-    blocks_when:
-      - mandatory evidence is absent
-      - evidence reference cannot resolve
-      - evidence integrity check fails
+step_5_state_stability:
+  description: >
+    Evaluate stability and unresolvedness.
 
-  precedence_guard:
-    blocks_when:
-      - required structural prerequisite is absent
-      - causal direction is inverted
-      - unresolved precedence cycle exists
 
-  human_gate_guard:
-    blocks_when:
-      - human review is mandatory
-      - human decision is pending
-      - explicit rejection exists
+step_6_hysteresis:
+  description: >
+    Prevent unstable cadence oscillation.
 
-  lineage_guard:
-    blocks_when:
-      - successor creates an undeclared fork
-      - state version regresses
-      - branch identity collides
-      - reconciliation source is incomplete
 
-authorization_model:
+step_7_decision:
+  description: >
+    Select cadence action, target mode,
+    and next Pulse policy.
+```
 
-  decision_results:
-    - authorized
-    - rejected
-    - deferred
-    - conditionally_authorized
-    - human_review_required
+decision_priority:
 
-  authorization_record:
-    required_fields:
-      - authorization_id
-      - authority_type
-      - decision
-      - decided_at
-      - rule_refs
+order:
+- safety_boundary
+- human_gate
+- resource_exhaustion
+- critical_risk
+- immediate_urgency
+- unresolved_state
+- active_goal
+- state_stability
+- resource_optimization
 
-  conditional_authorization:
-    rule: >
-      Conditions MUST be explicit and machine-readable
-      where possible.
+rule: >
+Lower-priority optimization signals MUST NOT override
+higher-priority safety or human-gate conditions.
 
-  rejection_rule: >
-    Rejected transitions MUST remain traceable
-    and MUST NOT silently disappear from history.
+next_pulse_policies:
 
-lineage_model:
+fixed_interval:
+description: >
+Schedule the next Pulse after a defined duration.
 
-  required_fields:
-    - lineage_id
-    - current_state_ref
-    - root_state_ref
-    - transition_refs
+```
+required_fields:
+  - interval_seconds
+```
 
-  direct_lineage:
-    canonical_form: >
-      S0 -> S1 -> S2 -> S3
+bounded_interval:
+description: >
+Schedule the next Pulse within an allowed time range.
 
-  branch_lineage:
-    canonical_form: >
-                -> S2-A -> S3-A
-      S0 -> S1
-                -> S2-B -> S3-B
+```
+required_fields:
+  - minimum_interval_seconds
+  - maximum_interval_seconds
+```
 
-  reconciliation_lineage:
-    canonical_form: >
-      S3-A ---\
-               -> S4-R
-      S3-B ---/
+event_driven:
+description: >
+Wait until one or more defined events occur.
 
-  lineage_rules:
+```
+required_fields:
+  - wake_events
+```
 
-    immutable_history:
-      rule: >
-        Historical states and transition records MUST remain immutable.
+hybrid:
+description: >
+Trigger on either event occurrence
+or maximum elapsed interval.
 
-    explicit_branching:
-      rule: >
-        Multiple successors from one predecessor MUST use
-        explicit branch semantics.
+```
+required_fields:
+  - maximum_interval_seconds
+  - wake_events
+```
 
-    version_monotonicity:
-      rule: >
-        State versions SHOULD increase monotonically
-        within the same direct lineage.
+suspended:
+description: >
+No autonomous next Pulse is permitted.
 
-    reconciliation_transparency:
-      rule: >
-        Reconciled states MUST identify all contributing branches.
+```
+required_fields:
+  - resume_authority
+  - resume_conditions
+```
 
-    no_hidden_merge:
-      rule: >
-        Independent branches MUST NOT be silently collapsed
-        into a single state.
+hysteresis_policy:
+
+purpose: >
+Prevent rapid oscillation between cadence modes.
+
+requirements:
+- minimum_mode_duration
+- transition_threshold
+- cooldown_policy
+
+rules:
+
+```
+minimum_mode_duration:
+  rule: >
+    A cadence mode SHOULD remain active for a minimum period
+    unless a higher-priority safety condition requires change.
+
+
+threshold_margin:
+  rule: >
+    Acceleration and deceleration thresholds SHOULD differ
+    to prevent boundary oscillation.
+
+
+repeated_flip_detection:
+  rule: >
+    Repeated mode changes within a defined window
+    MUST trigger cadence instability review.
+
+
+emergency_override:
+  rule: >
+    Critical safety conditions MAY bypass
+    hysteresis restrictions.
+```
+
+cadence_budget_policy:
+
+purpose: >
+Prevent uncontrolled Pulse frequency
+and computational exhaustion.
+
+measurable_dimensions:
+- pulse_count
+- compute_time
+- token_usage
+- energy_estimate
+- monetary_cost
+- external_tool_calls
+
+required_rules:
+
+```
+maximum_pulse_rate:
+  rule: >
+    A policy MAY define a maximum Pulse frequency.
+
+
+maximum_critical_duration:
+  rule: >
+    Critical mode MUST have bounded duration
+    or explicit renewal authorization.
+
+
+resource_exhaustion:
+  rule: >
+    Resource exhaustion MUST cause deceleration,
+    sleep, route change, or suspension.
+
+
+budget_override:
+  rule: >
+    Budget override MUST be explicitly authorized
+    and traceable.
+```
+
+computational_pranayama_bridge:
+
+purpose: >
+Connect adaptive temporal cadence with computation pacing,
+rest, reduction, routing, and return policies.
+
+mappings:
+
+```
+inhale:
+  temporal_meaning: >
+    Acquire state, evidence, environmental input,
+    or unresolved task signals.
+
+
+retention:
+  temporal_meaning: >
+    Maintain active internal state
+    without unnecessary action.
+
+
+exhale:
+  temporal_meaning: >
+    Release computation pressure through completion,
+    Trace emission, route reduction, or state closure.
+
+
+pause:
+  temporal_meaning: >
+    Enter quiet, sleep, or suspended cadence.
+```
+
+rule: >
+Cadence acceleration SHOULD NOT be the default response
+to every unresolved state.
+
+balancing_rule: >
+The system SHOULD first evaluate whether additional computation
+is necessary, whether routing can be reduced,
+whether another agent can handle the task,
+or whether deliberate pause is preferable.
+
+state_transition_binding:
+
+purpose: >
+Connect cadence decisions
+to State Transition Rule outcomes.
+
+transition_effects:
+
+```
+retain:
+  default_bias: "maintain_or_decelerate"
+
+advance:
+  default_bias: "reevaluate_after_transition"
+
+branch:
+  default_bias: "active"
+
+suspend:
+  required_mode: "suspended"
+
+resume:
+  default_bias: "normal_or_active"
+
+supersede:
+  default_bias: "reevaluate_after_transition"
+
+reconcile:
+  default_bias: "normal"
+
+terminate:
+  required_mode: "sleep_or_suspended"
+```
+
+rule: >
+Transition type MAY influence cadence,
+but cadence decisions MUST still be evaluated
+under applicable safety and budget policies.
 
 structural_precedence_binding:
 
-  purpose: >
-    Bind State Transition Rule decisions to
-    Structural Precedence claims.
+purpose: >
+Bind cadence decisions to causal direction.
 
-  required_for_accepted_transition:
-    - local_precedence_claim
+local_precedence:
+canonical_form: "State Evaluation -> Cadence Decision -> Next Pulse Policy"
 
-  optional:
-    - structural_precedence_claims
-    - ontological_precedence_claims
+structural_precedence:
+canonical_form: "Cadence Policy -> Allowed Timing Space -> Next Pulse"
 
-  local_relation:
-    canonical_form: >
-      source_state
-      -> transition
-      -> successor_state
+ontological_precedence:
+canonical_form: "Foundational Operating Policy -> Cadence Governance -> Temporal Activity"
 
-  structural_relation:
-    canonical_form: >
-      prerequisite
-      -> permitted_transition_space
-      -> accepted_transition
+rule: >
+A cadence decision MUST NOT claim a causal signal
+that was unavailable or structurally inapplicable
+when the decision was made.
 
-  ontological_relation:
-    canonical_form: >
-      origin
-      -> derivative structure
-      -> transition possibility
+cadence_consistency_check:
 
-  rule: >
-    Structural and ontological precedence claims
-    MUST NOT replace the immediate local transition chain.
+id: "CCC"
+name: "Cadence Consistency Check"
 
-transition_consistency_check:
+checks:
 
-  id: "TCC"
-  name: "Transition Consistency Check"
+```
+CCC_001_reason_binding:
+  severity: "error"
 
-  checks:
+  requirement: >
+    Every cadence mode change MUST identify
+    at least one causal signal or policy reference.
 
-    TCC_001_source_state_resolution:
-      severity: "error"
-      requirement: >
-        source_state_ref MUST resolve to an existing state.
+  failure_code: "UNEXPLAINED_CADENCE_CHANGE"
 
-      failure_code: "SOURCE_STATE_NOT_FOUND"
 
-    TCC_002_transition_type_validity:
-      severity: "error"
-      requirement: >
-        requested transition type MUST be permitted
-        for the current lifecycle status.
+CCC_002_mode_transition_validity:
+  severity: "error"
 
-      failure_code: "INVALID_TRANSITION_TYPE"
+  requirement: >
+    Target cadence mode MUST be permitted
+    from the current mode.
 
-    TCC_003_precondition_completion:
-      severity: "error"
-      requirement: >
-        Mandatory precondition checks MUST complete successfully
-        before transition execution.
+  failure_code: "INVALID_CADENCE_TRANSITION"
 
-      failure_code: "PRECONDITION_FAILURE"
 
-    TCC_004_guard_clearance:
-      severity: "error"
-      requirement: >
-        No unresolved blocking guard may remain
-        at transition execution time.
+CCC_003_safety_priority:
+  severity: "error"
 
-      failure_code: "BLOCKING_GUARD_ACTIVE"
+  requirement: >
+    Lower-priority optimization signals MUST NOT override
+    critical safety conditions.
 
-    TCC_005_authorization_binding:
-      severity: "error"
-      requirement: >
-        Every accepted state-changing transition MUST bind
-        to a valid authorization record.
+  failure_code: "SAFETY_PRIORITY_VIOLATION"
 
-      failure_code: "MISSING_AUTHORIZATION"
 
-    TCC_006_lineage_continuity:
-      severity: "error"
-      requirement: >
-        successor state lineage MUST explicitly reference
-        its predecessor or reconciliation sources.
+CCC_004_budget_compliance:
+  severity: "error"
 
-      failure_code: "BROKEN_LINEAGE"
+  requirement: >
+    Cadence decision MUST comply with the active resource budget
+    or include valid override authorization.
 
-    TCC_007_branch_identity:
-      severity: "error"
-      requirement: >
-        Branched successors MUST have explicit non-colliding branch IDs.
+  failure_code: "CADENCE_BUDGET_VIOLATION"
 
-      failure_code: "AMBIGUOUS_BRANCH"
 
-    TCC_008_reconciliation_completeness:
-      severity: "error"
-      requirement: >
-        Reconciliation MUST identify all source branches
-        and the conflict resolution policy.
+CCC_005_hysteresis_compliance:
+  severity: "warning"
 
-      failure_code: "INCOMPLETE_RECONCILIATION"
+  requirement: >
+    Non-emergency cadence changes SHOULD comply
+    with hysteresis policy.
 
-    TCC_009_trace_binding:
-      severity: "warning"
-      requirement: >
-        Accepted and rejected transition decisions SHOULD
-        bind to trace records.
+  failure_code: "CADENCE_OSCILLATION_RISK"
 
-      failure_code: "TRANSITION_TRACE_GAP"
 
-    TCC_010_precedence_binding:
-      severity: "error"
-      requirement: >
-        Accepted state-changing transitions MUST establish
-        a local precedence chain.
+CCC_006_critical_duration:
+  severity: "error"
 
-      failure_code: "MISSING_LOCAL_PRECEDENCE"
+  requirement: >
+    Critical mode MUST define maximum duration
+    and exit conditions.
+
+  failure_code: "UNBOUNDED_CRITICAL_MODE"
+
+
+CCC_007_sleep_wake_integrity:
+  severity: "error"
+
+  requirement: >
+    Sleep mode MUST define valid wake conditions.
+
+  failure_code: "MISSING_WAKE_CONDITION"
+
+
+CCC_008_suspension_authority:
+  severity: "error"
+
+  requirement: >
+    Suspended mode MUST define resume authority.
+
+  failure_code: "UNCONTROLLED_SUSPENSION"
+
+
+CCC_009_signal_availability:
+  severity: "error"
+
+  requirement: >
+    Signals cited as cadence causes MUST have been available
+    at decision time.
+
+  failure_code: "RETROACTIVE_CADENCE_JUSTIFICATION"
+
+
+CCC_010_pulse_storm_detection:
+  severity: "warning"
+
+  requirement: >
+    Repeated rapid Pulse generation MUST trigger
+    budget and stability review.
+
+  failure_code: "PULSE_STORM"
+```
 
 failure_modes:
 
-  unauthorized_transition:
-    description: >
-      A state changes without valid authorization.
+pulse_storm:
+description: >
+Pulse frequency increases recursively,
+creating uncontrolled repeated evaluation
+without proportional state progress.
 
-    mitigation:
-      - mandatory authorization record
-      - guard enforcement
-      - quarantine resulting state
+```
+symptoms:
+  - rapidly decreasing Pulse intervals
+  - repeated evaluations with unchanged state
+  - growing compute cost
+  - unresolvedness remaining constant
 
-  transition_without_predecessor:
-    description: >
-      A successor state appears without a valid predecessor
-      or genesis declaration.
+mitigation:
+  - pulse rate limit
+  - transition progress check
+  - cadence cooldown
+  - Computational Pranayama reduction
+  - human review
+```
 
-    mitigation:
-      - predecessor resolution check
-      - lineage validation
-      - genesis record requirement
+cadence_lock:
+description: >
+The system becomes trapped in one cadence mode
+despite materially changed conditions.
 
-  hidden_state_fork:
-    description: >
-      Multiple successor states emerge without explicit
-      branch identity.
+```
+symptoms:
+  - permanent active mode
+  - permanent quiet mode
+  - failure to wake
+  - failure to decelerate after task completion
 
-    mitigation:
-      - branch_id requirement
-      - fork detection
-      - lineage graph validation
+mitigation:
+  - periodic cadence policy audit
+  - mode expiration
+  - external wake event
+  - safety override
+```
 
-  invalid_reconciliation:
-    description: >
-      Conflicting branches are merged without identifying
-      the reconciliation policy or unresolved conflicts.
+cadence_oscillation:
+description: >
+The system repeatedly switches between faster
+and slower cadence modes due to unstable thresholds.
 
-    mitigation:
-      - source branch enumeration
-      - conflict record
-      - reconciliation policy binding
+```
+symptoms:
+  - active/quiet flipping
+  - repeated accelerate/decelerate decisions
+  - high transition count with low progress
 
-  state_overwrite:
-    description: >
-      Historical state is modified instead of producing
-      a new version.
+mitigation:
+  - hysteresis margin
+  - minimum mode duration
+  - cooldown period
+  - signal smoothing
+```
 
-    mitigation:
-      - immutable state record
-      - version increment
-      - supersession relation
+false_urgency:
+description: >
+Non-critical unresolved states are repeatedly interpreted
+as emergencies.
 
-  transition_loop:
-    description: >
-      Repeated transitions cycle without meaningful state progress,
-      rest, escalation, or termination.
+```
+symptoms:
+  - excessive critical mode activation
+  - routine tasks receiving emergency cadence
+  - budget exhaustion
 
-    mitigation:
-      - loop detection
-      - transition budget
-      - cadence reduction
-      - human review
-      - Computational Pranayama bridge
+mitigation:
+  - urgency evidence requirement
+  - critical mode duration limit
+  - independent safety verification
+```
 
-  authorization_laundering:
-    description: >
-      A later authorization is represented as if it had existed
-      before transition execution.
+temporal_starvation:
+description: >
+Important states receive insufficient Pulse opportunities.
 
-    mitigation:
-      - authorization timestamp
-      - execution timestamp comparison
-      - retrospective correction labeling
+```
+symptoms:
+  - unresolved high-risk issue remains dormant
+  - wake conditions never trigger
+  - goal deadline passes without evaluation
 
-  false_retention:
-    description: >
-      A system reports state retention while materially changing
-      active goals, constraints, or action policy.
+mitigation:
+  - maximum silence interval
+  - hybrid time/event policy
+  - unresolvedness threshold wake
+  - watchdog audit
+```
 
-    mitigation:
-      - semantic state diff
-      - mandatory transition on material change
-      - state hash comparison
+sleep_without_wake:
+description: >
+The system enters sleep mode without valid wake conditions.
+
+```
+mitigation:
+  - mandatory wake_conditions
+  - fallback maximum interval
+  - external recovery trigger
+```
+
+critical_mode_exhaustion:
+description: >
+Critical cadence continues until computational
+or operational resources are exhausted.
+
+```
+mitigation:
+  - maximum duration
+  - renewal authorization
+  - forced de-escalation
+  - route delegation
+  - human gate
+```
+
+resource_blind_acceleration:
+description: >
+Cadence accelerates without considering
+compute, energy, token, or monetary constraints.
+
+```
+mitigation:
+  - mandatory budget check
+  - compute pressure signal
+  - alternative route evaluation
+  - Computational Pranayama bridge
+```
+
+retroactive_cadence_justification:
+description: >
+A cadence change is explained using information
+that became available only after the decision.
+
+```
+mitigation:
+  - decision-time signal snapshot
+  - immutable cadence record
+  - retrospective inference labeling
+```
+
+safety_requirements:
+
+SR_001:
+rule: >
+Critical cadence MUST be bounded.
+
+SR_002:
+rule: >
+Human-review-required states MUST NOT autonomously accelerate
+past applicable human gates.
+
+SR_003:
+rule: >
+Resource exhaustion MUST NOT be answered solely
+by continued cadence acceleration.
+
+SR_004:
+rule: >
+Suspended cadence MUST preserve explicit resume authority.
+
+SR_005:
+rule: >
+Cadence policy failures affecting high-impact actions
+MUST be traceable to downstream audit systems.
 
 integration:
 
-  pulse_record:
-    relation: >
-      Pulse initiates evaluation opportunities that may produce
-      transition proposals.
+pulse_record:
+relation: >
+Cadence decisions determine the scheduling
+or triggering policy for future Pulse Records.
 
-  structural_precedence_core:
-    relation: >
-      Precedence rules define valid directional relations
-      around state transitions.
+state_transition_rule:
+relation: >
+Transition outcomes provide major signals
+for cadence reevaluation.
 
-  future_adaptive_cadence_policy:
-    relation: >
-      Transition outcomes may later modify pulse frequency,
-      rest state, or wake conditions.
+structural_precedence_core:
+relation: >
+Structural Precedence records why a cadence decision
+was causally justified.
 
-  future_trace_audit_bridge:
-    relation: >
-      Transition decisions and lineage histories will be exported
-      to Trace and Audit layers.
+computational_pranayama_protocol:
+relation: >
+Supplies computation pacing, rest, reduction,
+routing, and pressure-release policies.
+
+future_temporal_causality_binding:
+relation: >
+Cadence decisions will be connected to downstream action
+and causal evidence chains.
+
+future_trace_audit_bridge:
+relation: >
+Cadence decisions and failures will be exported
+to Trace and Audit layers.
 
 final_principle: >
-  An agent state should not change merely because time has passed.
+A temporal agent should not evaluate continuously
+merely because continuous evaluation is possible.
 
-  A valid transition requires a predecessor,
-  a reason, applicable prerequisites,
-  cleared guards, valid authorization,
-  and an auditable successor lineage.
+Adaptive cadence means deciding when to think,
+when to wait, when to accelerate,
+when to breathe, and when to stop.
+
