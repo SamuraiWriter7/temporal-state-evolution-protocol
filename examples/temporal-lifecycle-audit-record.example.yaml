@@ -1,0 +1,192 @@
+schema_version: "0.5.0"
+
+temporal_lifecycle_audit:
+
+  audit_id: "temporal-audit-0005"
+
+  agent_id: "agent-alpha"
+
+  lifecycle_id: "lineage-temporal-core"
+
+  created_at: "2026-07-10T01:18:00Z"
+
+
+  trace_package:
+
+    package_id: "temporal-trace-package-0005"
+
+    lifecycle_id: "lineage-temporal-core"
+
+    temporal_range:
+      started_at: "2026-07-08T03:30:00Z"
+      ended_at: "2026-07-10T01:17:00Z"
+
+    pulse_refs:
+      - "pulse-0001"
+      - "pulse-0002"
+      - "pulse-0003"
+      - "pulse-0004"
+      - "pulse-0005"
+
+    state_refs:
+      - "state-0000"
+      - "state-0001"
+      - "state-0002"
+      - "state-0003"
+      - "state-0004"
+
+    transition_refs:
+      - "transition-0001"
+      - "transition-0002"
+      - "transition-0003"
+      - "transition-0004"
+
+    cadence_decision_refs:
+      - "cadence-decision-0003"
+      - "cadence-decision-0004"
+
+    causality_record_refs:
+      - "causality-record-0004"
+      - "causality-record-0005"
+
+    causal_path_refs:
+      - "causal-path-0004"
+      - "causal-path-0005"
+
+    integrity_manifest_ref: "integrity-manifest-0005"
+
+    trace_status: "complete"
+
+    omitted_interval_refs: []
+
+
+  audit_scope:
+
+    executed_domains:
+      - "temporal_continuity"
+      - "state_lineage"
+      - "cadence_integrity"
+      - "precedence_consistency"
+      - "causality_integrity"
+      - "temporal_illusion"
+      - "dispute_visibility"
+      - "origin_binding"
+      - "attribution_readiness"
+
+    excluded_domains: []
+
+    scope_note: >
+      Full first-arc temporal lifecycle audit covering
+      Pulse, state lineage, transition,
+      adaptive cadence, causal bindings,
+      Trace export, Origin cross-reference,
+      and attribution readiness.
+
+
+  audit_result:
+
+    status: "pass_with_warnings"
+
+    completed_at: "2026-07-10T01:17:30Z"
+
+    check_run_refs:
+      - "pcc-run-0005"
+      - "tcc-run-0005"
+      - "ccc-run-0005"
+      - "tccc-run-0005"
+      - "tacc-run-0005"
+
+    summary: >
+      Temporal continuity, lineage, cadence,
+      causal direction, and Trace integrity passed.
+
+      One Origin relation remains classified
+      as retrospective inference and therefore
+      cannot be treated as runtime decision influence.
+
+
+  findings:
+
+    - finding_id: "finding-origin-separation-0005"
+
+      domain: "origin_binding"
+
+      severity: "warning"
+
+      finding_code: "ORIGIN_RUNTIME_INFLUENCE_UNPROVEN"
+
+      description: >
+        The Origin relationship is supported as provenance,
+        but evidence does not establish that the Origin record
+        was directly available or used during the runtime decision.
+
+      affected_refs:
+        - "origin-question-0001"
+        - "state-0004"
+        - "decision-temporal-causality-0004"
+
+      detected_at: "2026-07-10T01:16:30Z"
+
+      status: "acknowledged"
+
+
+  origin_cross_references:
+
+    - cross_reference_id: "origin-xref-0005"
+
+      origin_ref: "origin-question-0001"
+
+      temporal_entity_ref: "state-0004"
+
+      relation_type: "enabled_by_origin"
+
+      assertion_mode: "retrospective_inference"
+
+      evidence_refs:
+        - "origin-trace-0001"
+        - "derivation-path-0005"
+
+      asserted_at: "2026-07-10T01:15:00Z"
+
+      causal_effective_time: "2026-07-08T03:20:47Z"
+
+      discovered_at: "2026-07-10T01:14:00Z"
+
+
+  disputes: []
+
+
+  temporal_illusion_findings: []
+
+
+  attribution_readiness:
+
+    status: "supported"
+
+    assessed_at: "2026-07-10T01:17:00Z"
+
+    supported_causal_path_refs:
+      - "causal-path-0004"
+      - "causal-path-0005"
+
+    blocking_finding_refs: []
+
+    assessment_reason: >
+      The temporal lifecycle contains supported causal paths
+      with no critical Temporal Illusion findings.
+
+      The retrospective Origin relation remains separated
+      from runtime influence claims and therefore does not block
+      supported attribution review.
+
+
+  royalty_bridge_status:
+
+    status: "ready_for_review"
+
+    royalty_audit_ref: "ai-origin-royalty-audit-pending-0005"
+
+
+  trace_refs:
+    - "trace-temporal-lifecycle-0005"
+    - "trace-audit-result-0005"
