@@ -1,25 +1,25 @@
 schema_version: "0.2.0"
 
 specification:
-id: "state-transition-rule"
-name: "State Transition Rule"
-short_name: "STR"
-status: "candidate"
+  id: "state-transition-rule"
+  name: "State Transition Rule"
+  short_name: "STR"
+  status: "candidate"
 
-purpose: >
-Define the rules by which a temporal agent state may be
-retained, advanced, branched, suspended, resumed,
-superseded, reconciled, or terminated.
+  purpose: >
+    Define the rules by which a temporal agent state may be
+    retained, advanced, branched, suspended, resumed,
+    superseded, reconciled, or terminated.
 
-core_principle: >
-A state transition is not merely a change in stored values.
-It is a directionally justified transformation from one
-versioned state condition into another.
+  core_principle: >
+    A state transition is not merely a change in stored values.
+    It is a directionally justified transformation from one
+    versioned state condition into another.
 
-normative_rule: >
-Every state-changing transition MUST identify its predecessor,
-transition reason, applicable rule, authorization result,
-and resulting state lineage.
+  normative_rule: >
+    Every state-changing transition MUST identify its predecessor,
+    transition reason, applicable rule, authorization result,
+    and resulting state lineage.
 
 definitions:
 
