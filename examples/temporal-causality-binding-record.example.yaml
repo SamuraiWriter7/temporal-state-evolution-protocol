@@ -1,0 +1,263 @@
+schema_version: "0.4.0"
+
+causality_record:
+
+  record_id: "causality-record-0004"
+
+  agent_id: "agent-alpha"
+
+  created_at: "2026-07-10T01:10:00Z"
+
+  decision_context:
+
+    context_id: "decision-context-0004"
+
+    captured_at: "2026-07-10T01:08:00Z"
+
+    pulse_ref: "pulse-0004"
+
+    state_ref: "state-0003"
+
+    evaluation_ref: "evaluation-0004"
+
+    decision_ref: "decision-temporal-causality-0004"
+
+    cadence_decision_ref: "cadence-decision-0003"
+
+    available_evidence_refs:
+      - "state-evaluation-0004"
+      - "transition-history-0001-0003"
+      - "cadence-record-0003"
+      - "structural-precedence-core"
+
+    applicable_policy_refs:
+      - "state-transition-rule"
+      - "adaptive-cadence-policy"
+      - "temporal-causality-binding"
+
+    active_goal_refs:
+      - "goal-bind-state-decision-action"
+
+    active_constraint_refs:
+      - "constraint-no-retroactive-causal-injection"
+      - "constraint-evidence-availability"
+
+    environmental_signal_refs:
+      - "external-question-0004"
+
+  evidence_availability:
+
+    - evidence_ref: "state-evaluation-0004"
+
+      availability_status: "used"
+
+      availability_checked_at: "2026-07-10T01:08:00Z"
+
+      available_from: "2026-07-10T01:07:30Z"
+
+      first_accessed_at: "2026-07-10T01:07:40Z"
+
+      used_at: "2026-07-10T01:08:10Z"
+
+      source_ref: "state-0003"
+
+    - evidence_ref: "later-analysis-0004"
+
+      availability_status: "discovered_later"
+
+      availability_checked_at: "2026-07-10T01:09:30Z"
+
+      available_from: "2026-07-10T01:09:20Z"
+
+      source_ref: "retrospective-analysis-process"
+
+  causal_bindings:
+
+    - binding_id: "binding-state-evaluation-0004"
+
+      predecessor_ref: "state-0003"
+
+      predecessor_type: "state"
+
+      successor_ref: "evaluation-0004"
+
+      successor_type: "evaluation"
+
+      relation_type: "direct_cause"
+
+      causal_basis: "explicit_runtime_reference"
+
+      temporal_context:
+        predecessor_time: "2026-07-10T01:07:00Z"
+        successor_time: "2026-07-10T01:08:00Z"
+        binding_asserted_at: "2026-07-10T01:08:30Z"
+        evidence_available_from: "2026-07-10T01:07:00Z"
+
+      evidence_refs:
+        - "state-evaluation-0004"
+        - "decision-context-0004"
+
+      confidence: 0.97
+
+      assertion_mode: "runtime_observed"
+
+      mechanism: >
+        The active state identified an unresolved causal gap,
+        which triggered evaluation of the missing
+        State-to-Decision and Decision-to-Action bindings.
+
+    - binding_id: "binding-evaluation-decision-0004"
+
+      predecessor_ref: "evaluation-0004"
+
+      predecessor_type: "evaluation"
+
+      successor_ref: "decision-temporal-causality-0004"
+
+      successor_type: "decision"
+
+      relation_type: "direct_cause"
+
+      causal_basis: "execution_dependency"
+
+      temporal_context:
+        predecessor_time: "2026-07-10T01:08:00Z"
+        successor_time: "2026-07-10T01:08:40Z"
+        binding_asserted_at: "2026-07-10T01:09:00Z"
+
+      evidence_refs:
+        - "evaluation-0004"
+        - "decision-context-0004"
+
+      confidence: 0.98
+
+      assertion_mode: "runtime_observed"
+
+      mechanism: >
+        The evaluation concluded that temporal sequence alone
+        was insufficient and authorized creation
+        of an explicit causal binding layer.
+
+    - binding_id: "binding-decision-action-0004"
+
+      predecessor_ref: "decision-temporal-causality-0004"
+
+      predecessor_type: "decision"
+
+      successor_ref: "action-create-tcb-spec-0004"
+
+      successor_type: "action"
+
+      relation_type: "direct_cause"
+
+      causal_basis: "action_receipt"
+
+      temporal_context:
+        predecessor_time: "2026-07-10T01:08:40Z"
+        successor_time: "2026-07-10T01:09:10Z"
+        binding_asserted_at: "2026-07-10T01:09:20Z"
+
+      evidence_refs:
+        - "decision-temporal-causality-0004"
+        - "action-receipt-0004"
+
+      confidence: 1.0
+
+      assertion_mode: "runtime_observed"
+
+      mechanism: >
+        The accepted decision directly authorized
+        creation of the Temporal Causality Binding specification.
+
+    - binding_id: "binding-policy-decision-0004"
+
+      predecessor_ref: "structural-precedence-core"
+
+      predecessor_type: "policy"
+
+      successor_ref: "decision-temporal-causality-0004"
+
+      successor_type: "decision"
+
+      relation_type: "enabling_condition"
+
+      causal_basis: "policy_dependency"
+
+      temporal_context:
+        predecessor_time: "2026-07-08T03:30:00Z"
+        successor_time: "2026-07-10T01:08:40Z"
+        binding_asserted_at: "2026-07-10T01:09:30Z"
+
+      evidence_refs:
+        - "structural-precedence-core"
+        - "decision-context-0004"
+
+      confidence: 0.95
+
+      assertion_mode: "machine_inferred"
+
+      mechanism: >
+        Structural Precedence supplied the distinction
+        between chronological order and directed causal dependency.
+
+  causal_path:
+
+    path_id: "causal-path-0004"
+
+    root_ref: "state-0003"
+
+    terminal_ref: "action-create-tcb-spec-0004"
+
+    ordered_binding_refs:
+      - "binding-state-evaluation-0004"
+      - "binding-evaluation-decision-0004"
+      - "binding-decision-action-0004"
+
+    path_status: "supported"
+
+    aggregate_confidence: 0.97
+
+    causal_gap_refs: []
+
+    competing_path_refs: []
+
+  counterfactual_support:
+
+    - counterfactual_id: "counterfactual-0004"
+
+      binding_ref: "binding-evaluation-decision-0004"
+
+      method: "replay"
+
+      result: "supports"
+
+      executed_at: "2026-07-10T01:09:40Z"
+
+      assumption_refs:
+        - "assumption-same-state-context"
+
+      evidence_refs:
+        - "replay-result-0004"
+
+  disputes: []
+
+  temporal_illusion_check:
+
+    check_id: "tid-check-0004"
+
+    checked_at: "2026-07-10T01:10:00Z"
+
+    status: "pass"
+
+    executed_rules:
+      - "TID_001_late_evidence_injection"
+      - "TID_002_reconstructed_context_substitution"
+      - "TID_003_post_hoc_narrative"
+      - "TID_004_timestamp_causality"
+      - "TID_005_future_knowledge_backflow"
+      - "TID_006_superseded_decision_confusion"
+
+    finding_refs: []
+
+  trace_refs:
+    - "trace-temporal-causality-0004"
