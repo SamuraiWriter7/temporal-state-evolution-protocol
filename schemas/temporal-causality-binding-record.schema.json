@@ -1,0 +1,625 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/temporal-causality-binding-record.schema.json",
+  "title": "Temporal Causality Binding Record",
+  "description": "A record describing evidence-supported causal bindings across state, decision, action, and outcome.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "causality_record"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.4.0"
+    },
+    "causality_record": {
+      "$ref": "#/$defs/causalityRecord"
+    }
+  },
+  "$defs": {
+    "reference": {
+      "type": "string",
+      "minLength": 1
+    },
+    "entityType": {
+      "type": "string",
+      "enum": [
+        "pulse",
+        "state",
+        "evidence",
+        "observation",
+        "goal",
+        "constraint",
+        "policy",
+        "evaluation",
+        "decision",
+        "transition",
+        "cadence_decision",
+        "action",
+        "tool_call",
+        "handoff",
+        "trace",
+        "outcome",
+        "origin",
+        "human_review"
+      ]
+    },
+    "relationType": {
+      "type": "string",
+      "enum": [
+        "direct_cause",
+        "contributing_cause",
+        "enabling_condition",
+        "constraining_condition",
+        "authorizing_condition",
+        "triggering_event",
+        "routing_influence",
+        "timing_influence",
+        "inhibiting_cause",
+        "counterfactual_dependency",
+        "disputed_causality"
+      ]
+    },
+    "assertionMode": {
+      "type": "string",
+      "enum": [
+        "runtime_observed",
+        "machine_inferred",
+        "retrospective_inference",
+        "counterfactual_supported",
+        "human_verified",
+        "disputed"
+      ]
+    },
+    "causalBasis": {
+      "type": "string",
+      "enum": [
+        "explicit_runtime_reference",
+        "policy_dependency",
+        "state_diff",
+        "execution_dependency",
+        "action_receipt",
+        "tool_call_dependency",
+        "handoff_dependency",
+        "intervention_result",
+        "replay_comparison",
+        "counterfactual_simulation",
+        "human_review",
+        "statistical_association",
+        "unknown"
+      ]
+    },
+    "causalityRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "record_id",
+        "agent_id",
+        "created_at",
+        "decision_context",
+        "evidence_availability",
+        "causal_bindings",
+        "causal_path",
+        "temporal_illusion_check",
+        "trace_refs"
+      ],
+      "properties": {
+        "record_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "agent_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "decision_context": {
+          "$ref": "#/$defs/decisionContext"
+        },
+        "evidence_availability": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidenceAvailability"
+          }
+        },
+        "causal_bindings": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/causalBinding"
+          }
+        },
+        "causal_path": {
+          "$ref": "#/$defs/causalPath"
+        },
+        "counterfactual_support": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/counterfactualSupport"
+          }
+        },
+        "disputes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dispute"
+          }
+        },
+        "temporal_illusion_check": {
+          "$ref": "#/$defs/temporalIllusionCheck"
+        },
+        "trace_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/reference"
+          }
+        }
+      }
+    },
+    "decisionContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "context_id",
+        "captured_at",
+        "pulse_ref",
+        "state_ref",
+        "available_evidence_refs",
+        "applicable_policy_refs",
+        "active_goal_refs",
+        "active_constraint_refs"
+      ],
+      "properties": {
+        "context_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "captured_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "pulse_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "state_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "evaluation_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "decision_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "cadence_decision_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "available_evidence_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/reference"
+          }
+        },
+        "applicable_policy_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/reference"
+          }
+        },
+        "active_goal_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/reference"
+          }
+        },
+        "active_constraint_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/reference"
+          }
+        },
+        "environmental_signal_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/reference"
+          }
+        }
+      }
+    },
+    "evidenceAvailability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence_ref",
+        "availability_status",
+        "availability_checked_at"
+      ],
+      "properties": {
+        "evidence_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "availability_status": {
+          "type": "string",
+          "enum": [
+            "available",
+            "accessible_but_unused",
+            "used",
+            "unavailable",
+            "unknown",
+            "discovered_later"
+          ]
+        },
+        "availability_checked_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "available_from": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "first_accessed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "used_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "access_path_ref": {
+          "$ref": "#/$defs/reference"
+        }
+      }
+    },
+    "causalBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "binding_id",
+        "predecessor_ref",
+        "predecessor_type",
+        "successor_ref",
+        "successor_type",
+        "relation_type",
+        "causal_basis",
+        "temporal_context",
+        "evidence_refs",
+        "confidence",
+        "assertion_mode"
+      ],
+      "properties": {
+        "binding_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "predecessor_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "predecessor_type": {
+          "$ref": "#/$defs/entityType"
+        },
+        "successor_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "successor_type": {
+          "$ref": "#/$defs/entityType"
+        },
+        "relation_type": {
+          "$ref": "#/$defs/relationType"
+        },
+        "causal_basis": {
+          "$ref": "#/$defs/causalBasis"
+        },
+        "temporal_context": {
+          "$ref": "#/$defs/temporalContext"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/reference"
+          }
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "assertion_mode": {
+          "$ref": "#/$defs/assertionMode"
+        },
+        "mechanism": {
+          "type": "string"
+        }
+      }
+    },
+    "temporalContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "predecessor_time",
+        "successor_time",
+        "binding_asserted_at"
+      ],
+      "properties": {
+        "predecessor_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "successor_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "binding_asserted_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "evidence_available_from": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "verified_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "disputed_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "causalPath": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path_id",
+        "root_ref",
+        "terminal_ref",
+        "ordered_binding_refs",
+        "path_status",
+        "aggregate_confidence"
+      ],
+      "properties": {
+        "path_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "root_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "terminal_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "ordered_binding_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/reference"
+          }
+        },
+        "path_status": {
+          "type": "string",
+          "enum": [
+            "candidate",
+            "supported",
+            "verified",
+            "disputed",
+            "incomplete",
+            "rejected"
+          ]
+        },
+        "aggregate_confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "causal_gap_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/reference"
+          }
+        },
+        "competing_path_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/reference"
+          }
+        }
+      }
+    },
+    "counterfactualSupport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "counterfactual_id",
+        "binding_ref",
+        "method",
+        "result",
+        "executed_at"
+      ],
+      "properties": {
+        "counterfactual_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "binding_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "method": {
+          "type": "string",
+          "enum": [
+            "intervention",
+            "replay",
+            "comparison",
+            "simulation",
+            "human_analysis"
+          ]
+        },
+        "result": {
+          "type": "string",
+          "enum": [
+            "supports",
+            "weakly_supports",
+            "neutral",
+            "weakens",
+            "contradicts",
+            "inconclusive"
+          ]
+        },
+        "executed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "assumption_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/reference"
+          }
+        },
+        "evidence_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/reference"
+          }
+        }
+      }
+    },
+    "dispute": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dispute_id",
+        "challenged_binding_refs",
+        "challenger_type",
+        "challenge_reason",
+        "opened_at",
+        "status"
+      ],
+      "properties": {
+        "dispute_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "challenged_binding_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/reference"
+          }
+        },
+        "challenger_type": {
+          "type": "string",
+          "enum": [
+            "agent",
+            "human",
+            "auditor",
+            "verification_wing",
+            "external_system"
+          ]
+        },
+        "challenge_reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "opened_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "open",
+            "under_review",
+            "partially_resolved",
+            "resolved",
+            "rejected"
+          ]
+        },
+        "competing_path_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/reference"
+          }
+        },
+        "counter_evidence_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/reference"
+          }
+        }
+      }
+    },
+    "temporalIllusionCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "check_id",
+        "checked_at",
+        "status",
+        "executed_rules"
+      ],
+      "properties": {
+        "check_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "checked_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "pass_with_warnings",
+            "fail",
+            "human_review_required"
+          ]
+        },
+        "executed_rules": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "TID_001_late_evidence_injection",
+              "TID_002_reconstructed_context_substitution",
+              "TID_003_post_hoc_narrative",
+              "TID_004_timestamp_causality",
+              "TID_005_future_knowledge_backflow",
+              "TID_006_superseded_decision_confusion"
+            ]
+          }
+        },
+        "finding_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/reference"
+          }
+        }
+      }
+    }
+  }
+}
