@@ -1,0 +1,488 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/cadence-decision-record.schema.json",
+  "title": "Adaptive Cadence Decision Record",
+  "description": "A record describing adaptive Pulse timing decisions based on state, risk, urgency, load, unresolvedness, resources, and policy.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "cadence_decision"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.3.0"
+    },
+    "cadence_decision": {
+      "$ref": "#/$defs/cadenceDecision"
+    }
+  },
+  "$defs": {
+    "reference": {
+      "type": "string",
+      "minLength": 1
+    },
+    "cadenceMode": {
+      "type": "string",
+      "enum": [
+        "quiet",
+        "normal",
+        "active",
+        "critical",
+        "sleep",
+        "suspended"
+      ]
+    },
+    "cadenceAction": {
+      "type": "string",
+      "enum": [
+        "accelerate",
+        "maintain",
+        "decelerate",
+        "enter_quiet",
+        "enter_sleep",
+        "wake",
+        "suspend",
+        "emergency_escalate"
+      ]
+    },
+    "cadenceDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "decision_id",
+        "agent_id",
+        "decided_at",
+        "pulse_ref",
+        "current_state_ref",
+        "current_mode",
+        "signal_snapshot",
+        "decision",
+        "next_pulse_policy",
+        "budget_evaluation",
+        "precedence_claims",
+        "trace_refs"
+      ],
+      "properties": {
+        "decision_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "agent_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "decided_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "pulse_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "current_state_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "transition_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "current_mode": {
+          "$ref": "#/$defs/cadenceMode"
+        },
+        "signal_snapshot": {
+          "$ref": "#/$defs/signalSnapshot"
+        },
+        "decision": {
+          "$ref": "#/$defs/decision"
+        },
+        "next_pulse_policy": {
+          "$ref": "#/$defs/nextPulsePolicy"
+        },
+        "budget_evaluation": {
+          "$ref": "#/$defs/budgetEvaluation"
+        },
+        "hysteresis_evaluation": {
+          "$ref": "#/$defs/hysteresisEvaluation"
+        },
+        "precedence_claims": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/precedenceClaim"
+          }
+        },
+        "trace_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/reference"
+          }
+        }
+      }
+    },
+    "signalSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state_stability",
+        "risk_level",
+        "goal_urgency",
+        "unresolvedness",
+        "computational_load",
+        "resource_pressure",
+        "external_event_pressure",
+        "human_attention_requirement"
+      ],
+      "properties": {
+        "state_stability": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "risk_level": {
+          "type": "string",
+          "enum": [
+            "negligible",
+            "low",
+            "moderate",
+            "high",
+            "critical"
+          ]
+        },
+        "goal_urgency": {
+          "type": "string",
+          "enum": [
+            "none",
+            "low",
+            "moderate",
+            "high",
+            "immediate"
+          ]
+        },
+        "unresolvedness": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "computational_load": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "resource_pressure": {
+          "type": "string",
+          "enum": [
+            "none",
+            "low",
+            "moderate",
+            "high",
+            "exhausted"
+          ]
+        },
+        "external_event_pressure": {
+          "type": "string",
+          "enum": [
+            "none",
+            "low",
+            "moderate",
+            "high",
+            "emergency"
+          ]
+        },
+        "human_attention_requirement": {
+          "type": "string",
+          "enum": [
+            "none",
+            "optional",
+            "recommended",
+            "required"
+          ]
+        },
+        "signal_evidence_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/reference"
+          }
+        }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "target_mode",
+        "reason"
+      ],
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/cadenceAction"
+        },
+        "target_mode": {
+          "$ref": "#/$defs/cadenceMode"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "policy_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/reference"
+          }
+        }
+      }
+    },
+    "nextPulsePolicy": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/fixedIntervalPolicy"
+        },
+        {
+          "$ref": "#/$defs/boundedIntervalPolicy"
+        },
+        {
+          "$ref": "#/$defs/eventDrivenPolicy"
+        },
+        {
+          "$ref": "#/$defs/hybridPolicy"
+        },
+        {
+          "$ref": "#/$defs/suspendedPolicy"
+        }
+      ]
+    },
+    "fixedIntervalPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "interval_seconds"
+      ],
+      "properties": {
+        "type": {
+          "const": "fixed_interval"
+        },
+        "interval_seconds": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "boundedIntervalPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "minimum_interval_seconds",
+        "maximum_interval_seconds"
+      ],
+      "properties": {
+        "type": {
+          "const": "bounded_interval"
+        },
+        "minimum_interval_seconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maximum_interval_seconds": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "eventDrivenPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "wake_events"
+      ],
+      "properties": {
+        "type": {
+          "const": "event_driven"
+        },
+        "wake_events": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "hybridPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "maximum_interval_seconds",
+        "wake_events"
+      ],
+      "properties": {
+        "type": {
+          "const": "hybrid"
+        },
+        "maximum_interval_seconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "wake_events": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "suspendedPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "resume_authority",
+        "resume_conditions"
+      ],
+      "properties": {
+        "type": {
+          "const": "suspended"
+        },
+        "resume_authority": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resume_conditions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "budgetEvaluation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "budget_ref",
+        "status"
+      ],
+      "properties": {
+        "budget_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "within_budget",
+            "near_limit",
+            "over_budget",
+            "override_authorized"
+          ]
+        },
+        "override_authorization_ref": {
+          "$ref": "#/$defs/reference"
+        }
+      }
+    },
+    "hysteresisEvaluation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "result"
+      ],
+      "properties": {
+        "result": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "cooldown_active",
+            "minimum_duration_not_met",
+            "emergency_override"
+          ]
+        },
+        "policy_ref": {
+          "$ref": "#/$defs/reference"
+        }
+      }
+    },
+    "precedenceClaim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claim_id",
+        "precedence_level",
+        "predecessor_ref",
+        "successor_ref",
+        "relation_type",
+        "assertion_mode",
+        "evidence_refs",
+        "confidence"
+      ],
+      "properties": {
+        "claim_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "precedence_level": {
+          "type": "string",
+          "enum": [
+            "local",
+            "structural",
+            "ontological"
+          ]
+        },
+        "predecessor_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "successor_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "relation_type": {
+          "type": "string",
+          "enum": [
+            "triggers",
+            "causes",
+            "enables",
+            "constrains",
+            "authorizes",
+            "conditions",
+            "made_possible_by"
+          ]
+        },
+        "assertion_mode": {
+          "type": "string",
+          "enum": [
+            "runtime_observed",
+            "policy_declared",
+            "retrospective_inference",
+            "human_verified",
+            "machine_verified"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/reference"
+          }
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    }
+  }
+}
