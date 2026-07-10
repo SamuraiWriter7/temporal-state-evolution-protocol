@@ -1,0 +1,292 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/pulse-record.schema.json",
+  "title": "Temporal State Evolution Pulse Record",
+  "description": "A record describing a temporal pulse, state evaluation, transition result, cadence decision, and structural precedence claims.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "pulse"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.1.0"
+    },
+    "pulse": {
+      "$ref": "#/$defs/pulse"
+    }
+  },
+  "$defs": {
+    "reference": {
+      "type": "string",
+      "minLength": 1
+    },
+    "pulse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pulse_id",
+        "agent_id",
+        "sequence_number",
+        "observed_at",
+        "trigger",
+        "previous_state_ref",
+        "evaluation",
+        "cadence",
+        "precedence_claims"
+      ],
+      "properties": {
+        "pulse_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "agent_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sequence_number": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "observed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "trigger": {
+          "$ref": "#/$defs/trigger"
+        },
+        "previous_state_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "evaluation": {
+          "$ref": "#/$defs/evaluation"
+        },
+        "transition": {
+          "$ref": "#/$defs/transition"
+        },
+        "cadence": {
+          "$ref": "#/$defs/cadence"
+        },
+        "precedence_claims": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/precedenceClaim"
+          }
+        },
+        "trace_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/reference"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "trigger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "external_input",
+            "scheduled_pulse",
+            "state_threshold",
+            "risk_event",
+            "goal_progress",
+            "trace_reactivation",
+            "human_gate",
+            "system_recovery"
+          ]
+        },
+        "reference": {
+          "$ref": "#/$defs/reference"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "evaluation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "result",
+        "reason"
+      ],
+      "properties": {
+        "result": {
+          "type": "string",
+          "enum": [
+            "retain",
+            "transition",
+            "accelerate",
+            "decelerate",
+            "sleep",
+            "wake",
+            "escalate",
+            "request_human_review"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evaluation_ref": {
+          "$ref": "#/$defs/reference"
+        }
+      }
+    },
+    "transition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "transition_id",
+        "from_state_ref",
+        "to_state_ref"
+      ],
+      "properties": {
+        "transition_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "from_state_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "to_state_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "cause_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/reference"
+          },
+          "uniqueItems": true
+        },
+        "rule_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/reference"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "cadence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "next_pulse_policy"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "quiet",
+            "normal",
+            "active",
+            "critical",
+            "sleep",
+            "suspended"
+          ]
+        },
+        "next_pulse_policy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "next_pulse_due": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "precedenceClaim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claim_id",
+        "precedence_level",
+        "predecessor_ref",
+        "successor_ref",
+        "relation_type",
+        "assertion_mode",
+        "evidence_refs",
+        "confidence"
+      ],
+      "properties": {
+        "claim_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "precedence_level": {
+          "type": "string",
+          "enum": [
+            "local",
+            "structural",
+            "ontological"
+          ]
+        },
+        "predecessor_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "successor_ref": {
+          "$ref": "#/$defs/reference"
+        },
+        "relation_type": {
+          "type": "string",
+          "enum": [
+            "triggers",
+            "transitions_to",
+            "causes",
+            "evaluated_before",
+            "activates",
+            "requires",
+            "enables",
+            "constrains",
+            "authorizes",
+            "prohibits",
+            "routes",
+            "conditions",
+            "inherits_from",
+            "originates_from",
+            "derives_from",
+            "constituted_by",
+            "made_possible_by"
+          ]
+        },
+        "assertion_mode": {
+          "type": "string",
+          "enum": [
+            "runtime_observed",
+            "policy_declared",
+            "retrospective_inference",
+            "human_verified",
+            "machine_verified"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/reference"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    }
+  }
+}
