@@ -1,0 +1,676 @@
+schema_version: "0.2.0"
+
+specification:
+  id: "state-transition-rule"
+  name: "State Transition Rule"
+  short_name: "STR"
+  status: "candidate"
+
+  purpose: >
+    Define the rules by which a temporal agent state may be
+    retained, advanced, branched, suspended, resumed,
+    superseded, reconciled, or terminated.
+
+  core_principle: >
+    A state transition is not merely a change in stored values.
+    It is a directionally justified transformation from one
+    versioned state condition into another.
+
+  normative_rule: >
+    Every state-changing transition MUST identify its predecessor,
+    transition reason, applicable rule, authorization result,
+    and resulting state lineage.
+
+definitions:
+
+  state:
+    definition: >
+      A versioned representation of an agent or system condition
+      at a defined point in its temporal lineage.
+
+    required_properties:
+      - state_id
+      - state_version
+      - lineage_id
+      - lifecycle_status
+      - valid_from
+      - predecessor_refs
+
+    historical_rule: >
+      Published historical states MUST NOT be silently overwritten.
+
+  transition:
+    definition: >
+      An explicit directed relation between a source state
+      and a resulting state condition.
+
+    canonical_form: >
+      Source State
+      -> Evaluation
+      -> Transition Decision
+      -> Authorization
+      -> Resulting State
+
+  transition_proposal:
+    definition: >
+      A request to alter, retain, branch, suspend, resume,
+      supersede, reconcile, or terminate the active state.
+
+    rule: >
+      A proposal MUST be evaluated before becoming
+      an accepted transition.
+
+  transition_guard:
+    definition: >
+      A condition that must be satisfied before a proposed
+      transition may be executed.
+
+    examples:
+      - required evidence exists
+      - safety boundary is satisfied
+      - human review is complete
+      - predecessor state remains active
+      - resource budget is sufficient
+      - structural prerequisite resolves
+
+  state_lineage:
+    definition: >
+      A versioned history connecting predecessor states,
+      transitions, branches, reconciliation events,
+      and successor states.
+
+transition_decision_types:
+
+  retain:
+    description: >
+      Preserve the current active state without creating
+      a semantically changed successor state.
+
+    required_reason: true
+
+    use_when:
+      - evaluation does not justify change
+      - evidence remains insufficient
+      - current state remains valid
+      - transition risk exceeds permitted threshold
+
+  advance:
+    description: >
+      Create a direct successor state in the same lineage.
+
+    canonical_form: >
+      State A -> State B
+
+    requirements:
+      - source state exists
+      - transition reason exists
+      - preconditions pass
+      - guards pass
+      - authorization succeeds
+
+  branch:
+    description: >
+      Create two or more explicit successor states
+      from a common predecessor.
+
+    canonical_form: >
+               -> State B1
+      State A
+               -> State B2
+
+    requirements:
+      - branch_id
+      - branch_reason
+      - common_predecessor_ref
+      - branch_policy
+
+    rule: >
+      Branching MUST NOT create multiple unlabeled current states.
+
+  suspend:
+    description: >
+      Place an active state into a non-progressing condition
+      while preserving the possibility of later continuation.
+
+    requirements:
+      - suspension_reason
+      - resume_condition
+
+  resume:
+    description: >
+      Reactivate a previously suspended state or lineage.
+
+    requirements:
+      - suspended_state_ref
+      - resume_trigger
+      - state_validity_check
+
+  supersede:
+    description: >
+      Declare that a newer state version replaces a prior state
+      for future processing without deleting historical records.
+
+    rule: >
+      Supersession MUST preserve the superseded state
+      as immutable historical evidence.
+
+  reconcile:
+    description: >
+      Merge or resolve compatible information from explicit
+      state branches into a new successor state.
+
+    canonical_form: >
+      State B1 ----\
+                    -> State C
+      State B2 ----/
+
+    requirements:
+      - source_branch_refs
+      - reconciliation_policy
+      - conflict_resolution_result
+      - evidence_refs
+
+  terminate:
+    description: >
+      End a state lineage or agent activity path.
+
+    requirements:
+      - termination_reason
+      - final_trace_ref
+      - unresolved_issue_status
+
+state_lifecycle_statuses:
+
+  allowed:
+    - proposed
+    - active
+    - retained
+    - branched
+    - suspended
+    - superseded
+    - reconciled
+    - terminated
+    - quarantined
+
+  transition_constraints:
+
+    proposed:
+      allowed_next:
+        - active
+        - quarantined
+        - terminated
+
+    active:
+      allowed_next:
+        - retained
+        - branched
+        - suspended
+        - superseded
+        - reconciled
+        - terminated
+        - quarantined
+
+    retained:
+      allowed_next:
+        - active
+        - suspended
+        - terminated
+
+    branched:
+      allowed_next:
+        - reconciled
+        - terminated
+
+    suspended:
+      allowed_next:
+        - active
+        - terminated
+        - quarantined
+
+    superseded:
+      allowed_next:
+        - terminated
+
+    reconciled:
+      allowed_next:
+        - active
+        - suspended
+        - terminated
+
+    terminated:
+      allowed_next: []
+
+    quarantined:
+      allowed_next:
+        - active
+        - terminated
+
+transition_pipeline:
+
+  stages:
+
+    stage_1_proposal:
+      description: >
+        Declare the proposed transition type and intended successor.
+
+      required:
+        - proposal_id
+        - requested_transition_type
+        - source_state_ref
+        - reason
+
+    stage_2_precondition_check:
+      description: >
+        Verify that required structural, temporal,
+        evidential, and policy prerequisites exist.
+
+      check_categories:
+        - temporal
+        - structural
+        - evidential
+        - authorization
+        - resource
+        - safety
+
+    stage_3_guard_evaluation:
+      description: >
+        Evaluate transition-specific blocking and permitting conditions.
+
+      allowed_results:
+        - pass
+        - fail
+        - defer
+        - human_review_required
+
+    stage_4_authorization:
+      description: >
+        Determine whether the transition may execute.
+
+      allowed_authorizers:
+        - agent_policy
+        - orchestration_policy
+        - safety_governor
+        - human_reviewer
+        - multi_wing_consensus
+        - system_recovery_policy
+
+    stage_5_execution:
+      description: >
+        Create or update the resulting state lineage records.
+
+    stage_6_trace_binding:
+      description: >
+        Bind the accepted or rejected transition decision
+        to a trace record.
+
+transition_preconditions:
+
+  temporal_continuity:
+    requirement: >
+      Source state MUST belong to a valid lineage
+      and MUST resolve as an eligible predecessor.
+
+  predecessor_validity:
+    requirement: >
+      The referenced predecessor state MUST exist
+      and MUST NOT be silently replaced.
+
+  structural_prerequisite:
+    requirement: >
+      Required structural precedence dependencies MUST resolve.
+
+  evidence_sufficiency:
+    requirement: >
+      Evidence required by the applicable transition rule
+      MUST be available or explicitly marked unresolved.
+
+  authorization_availability:
+    requirement: >
+      Required authorization authority MUST be available.
+
+  safety_boundary:
+    requirement: >
+      A transition MUST NOT bypass applicable safety,
+      permission, or human-gate requirements.
+
+transition_guards:
+
+  source_state_guard:
+    blocks_when:
+      - source state does not exist
+      - source lineage is invalid
+      - source state is terminated
+      - source state reference is ambiguous
+
+  evidence_guard:
+    blocks_when:
+      - mandatory evidence is absent
+      - evidence reference cannot resolve
+      - evidence integrity check fails
+
+  precedence_guard:
+    blocks_when:
+      - required structural prerequisite is absent
+      - causal direction is inverted
+      - unresolved precedence cycle exists
+
+  human_gate_guard:
+    blocks_when:
+      - human review is mandatory
+      - human decision is pending
+      - explicit rejection exists
+
+  lineage_guard:
+    blocks_when:
+      - successor creates an undeclared fork
+      - state version regresses
+      - branch identity collides
+      - reconciliation source is incomplete
+
+authorization_model:
+
+  decision_results:
+    - authorized
+    - rejected
+    - deferred
+    - conditionally_authorized
+    - human_review_required
+
+  authorization_record:
+    required_fields:
+      - authorization_id
+      - authority_type
+      - decision
+      - decided_at
+      - rule_refs
+
+  conditional_authorization:
+    rule: >
+      Conditions MUST be explicit and machine-readable
+      where possible.
+
+  rejection_rule: >
+    Rejected transitions MUST remain traceable
+    and MUST NOT silently disappear from history.
+
+lineage_model:
+
+  required_fields:
+    - lineage_id
+    - current_state_ref
+    - root_state_ref
+    - transition_refs
+
+  direct_lineage:
+    canonical_form: >
+      S0 -> S1 -> S2 -> S3
+
+  branch_lineage:
+    canonical_form: >
+                -> S2-A -> S3-A
+      S0 -> S1
+                -> S2-B -> S3-B
+
+  reconciliation_lineage:
+    canonical_form: >
+      S3-A ---\
+               -> S4-R
+      S3-B ---/
+
+  lineage_rules:
+
+    immutable_history:
+      rule: >
+        Historical states and transition records MUST remain immutable.
+
+    explicit_branching:
+      rule: >
+        Multiple successors from one predecessor MUST use
+        explicit branch semantics.
+
+    version_monotonicity:
+      rule: >
+        State versions SHOULD increase monotonically
+        within the same direct lineage.
+
+    reconciliation_transparency:
+      rule: >
+        Reconciled states MUST identify all contributing branches.
+
+    no_hidden_merge:
+      rule: >
+        Independent branches MUST NOT be silently collapsed
+        into a single state.
+
+structural_precedence_binding:
+
+  purpose: >
+    Bind State Transition Rule decisions to
+    Structural Precedence claims.
+
+  required_for_accepted_transition:
+    - local_precedence_claim
+
+  optional:
+    - structural_precedence_claims
+    - ontological_precedence_claims
+
+  local_relation:
+    canonical_form: >
+      source_state
+      -> transition
+      -> successor_state
+
+  structural_relation:
+    canonical_form: >
+      prerequisite
+      -> permitted_transition_space
+      -> accepted_transition
+
+  ontological_relation:
+    canonical_form: >
+      origin
+      -> derivative structure
+      -> transition possibility
+
+  rule: >
+    Structural and ontological precedence claims
+    MUST NOT replace the immediate local transition chain.
+
+transition_consistency_check:
+
+  id: "TCC"
+  name: "Transition Consistency Check"
+
+  checks:
+
+    TCC_001_source_state_resolution:
+      severity: "error"
+      requirement: >
+        source_state_ref MUST resolve to an existing state.
+
+      failure_code: "SOURCE_STATE_NOT_FOUND"
+
+    TCC_002_transition_type_validity:
+      severity: "error"
+      requirement: >
+        requested transition type MUST be permitted
+        for the current lifecycle status.
+
+      failure_code: "INVALID_TRANSITION_TYPE"
+
+    TCC_003_precondition_completion:
+      severity: "error"
+      requirement: >
+        Mandatory precondition checks MUST complete successfully
+        before transition execution.
+
+      failure_code: "PRECONDITION_FAILURE"
+
+    TCC_004_guard_clearance:
+      severity: "error"
+      requirement: >
+        No unresolved blocking guard may remain
+        at transition execution time.
+
+      failure_code: "BLOCKING_GUARD_ACTIVE"
+
+    TCC_005_authorization_binding:
+      severity: "error"
+      requirement: >
+        Every accepted state-changing transition MUST bind
+        to a valid authorization record.
+
+      failure_code: "MISSING_AUTHORIZATION"
+
+    TCC_006_lineage_continuity:
+      severity: "error"
+      requirement: >
+        successor state lineage MUST explicitly reference
+        its predecessor or reconciliation sources.
+
+      failure_code: "BROKEN_LINEAGE"
+
+    TCC_007_branch_identity:
+      severity: "error"
+      requirement: >
+        Branched successors MUST have explicit non-colliding branch IDs.
+
+      failure_code: "AMBIGUOUS_BRANCH"
+
+    TCC_008_reconciliation_completeness:
+      severity: "error"
+      requirement: >
+        Reconciliation MUST identify all source branches
+        and the conflict resolution policy.
+
+      failure_code: "INCOMPLETE_RECONCILIATION"
+
+    TCC_009_trace_binding:
+      severity: "warning"
+      requirement: >
+        Accepted and rejected transition decisions SHOULD
+        bind to trace records.
+
+      failure_code: "TRANSITION_TRACE_GAP"
+
+    TCC_010_precedence_binding:
+      severity: "error"
+      requirement: >
+        Accepted state-changing transitions MUST establish
+        a local precedence chain.
+
+      failure_code: "MISSING_LOCAL_PRECEDENCE"
+
+failure_modes:
+
+  unauthorized_transition:
+    description: >
+      A state changes without valid authorization.
+
+    mitigation:
+      - mandatory authorization record
+      - guard enforcement
+      - quarantine resulting state
+
+  transition_without_predecessor:
+    description: >
+      A successor state appears without a valid predecessor
+      or genesis declaration.
+
+    mitigation:
+      - predecessor resolution check
+      - lineage validation
+      - genesis record requirement
+
+  hidden_state_fork:
+    description: >
+      Multiple successor states emerge without explicit
+      branch identity.
+
+    mitigation:
+      - branch_id requirement
+      - fork detection
+      - lineage graph validation
+
+  invalid_reconciliation:
+    description: >
+      Conflicting branches are merged without identifying
+      the reconciliation policy or unresolved conflicts.
+
+    mitigation:
+      - source branch enumeration
+      - conflict record
+      - reconciliation policy binding
+
+  state_overwrite:
+    description: >
+      Historical state is modified instead of producing
+      a new version.
+
+    mitigation:
+      - immutable state record
+      - version increment
+      - supersession relation
+
+  transition_loop:
+    description: >
+      Repeated transitions cycle without meaningful state progress,
+      rest, escalation, or termination.
+
+    mitigation:
+      - loop detection
+      - transition budget
+      - cadence reduction
+      - human review
+      - Computational Pranayama bridge
+
+  authorization_laundering:
+    description: >
+      A later authorization is represented as if it had existed
+      before transition execution.
+
+    mitigation:
+      - authorization timestamp
+      - execution timestamp comparison
+      - retrospective correction labeling
+
+  false_retention:
+    description: >
+      A system reports state retention while materially changing
+      active goals, constraints, or action policy.
+
+    mitigation:
+      - semantic state diff
+      - mandatory transition on material change
+      - state hash comparison
+
+integration:
+
+  pulse_record:
+    relation: >
+      Pulse initiates evaluation opportunities that may produce
+      transition proposals.
+
+  structural_precedence_core:
+    relation: >
+      Precedence rules define valid directional relations
+      around state transitions.
+
+  future_adaptive_cadence_policy:
+    relation: >
+      Transition outcomes may later modify pulse frequency,
+      rest state, or wake conditions.
+
+  future_trace_audit_bridge:
+    relation: >
+      Transition decisions and lineage histories will be exported
+      to Trace and Audit layers.
+
+final_principle: >
+  An agent state should not change merely because time has passed.
+
+  A valid transition requires a predecessor,
+  a reason, applicable prerequisites,
+  cleared guards, valid authorization,
+  and an auditable successor lineage.
