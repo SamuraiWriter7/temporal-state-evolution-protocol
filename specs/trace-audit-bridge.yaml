@@ -1,0 +1,986 @@
+schema_version: "0.5.0"
+
+specification:
+  id: "trace-audit-bridge"
+  name: "Trace & Audit Bridge"
+  short_name: "TAB"
+  status: "candidate"
+
+  purpose: >
+    Package temporal state evolution records into portable traces,
+    evaluate their causal and temporal integrity,
+    preserve disputes and uncertainty,
+    and provide controlled cross-references to Origin,
+    attribution, and Royalty systems.
+
+  core_principle: >
+    Trace preserves history.
+    Audit evaluates claims about that history.
+    Attribution consumes only the level of causal confidence
+    that the audit actually supports.
+
+  normative_rule: >
+    A temporal lifecycle MUST NOT be exported as verified causality
+    merely because its records are complete.
+
+    Completeness of trace and validity of causal interpretation
+    MUST remain separate properties.
+
+
+definitions:
+
+  temporal_trace_package:
+    definition: >
+      A portable package containing references to Pulse,
+      State, Transition, Cadence, Decision Context,
+      Causal Binding, Causal Path, dispute,
+      and integrity records.
+
+  lifecycle_audit:
+    definition: >
+      A structured review of temporal continuity,
+      state lineage, cadence validity,
+      causal direction, evidence availability,
+      precedence consistency, trace completeness,
+      and unresolved disputes.
+
+  audit_finding:
+    definition: >
+      A machine-readable issue, warning,
+      contradiction, gap, or verification result
+      produced during audit.
+
+  audit_status:
+    definition: >
+      The resulting confidence state assigned to
+      a temporal lifecycle after required checks.
+
+  origin_cross_reference:
+    definition: >
+      A non-destructive link connecting a temporal lifecycle
+      to upstream Origin records or provenance structures.
+
+  attribution_guard:
+    definition: >
+      A rule preventing unsupported,
+      disputed, incomplete, or temporally invalid causal paths
+      from being treated as settled contribution evidence.
+
+
+temporal_trace_package:
+
+  required_fields:
+    - package_id
+    - agent_id
+    - lifecycle_id
+    - created_at
+    - temporal_range
+    - pulse_refs
+    - state_refs
+    - transition_refs
+    - cadence_decision_refs
+    - causality_record_refs
+    - causal_path_refs
+    - integrity_manifest
+    - trace_status
+
+  optional_fields:
+    - origin_refs
+    - action_refs
+    - handoff_refs
+    - human_review_refs
+    - dispute_refs
+    - external_trace_refs
+    - royalty_candidate_refs
+
+  trace_statuses:
+    - complete
+    - partial
+    - disputed
+    - quarantined
+    - superseded
+
+  temporal_range:
+    required_fields:
+      - started_at
+      - ended_at
+
+    rule: >
+      The temporal range MUST describe the observed lifecycle interval
+      and MUST NOT imply causal continuity by itself.
+
+  integrity_manifest:
+    purpose: >
+      Preserve record identity and detect silent modification.
+
+    recommended_fields:
+      - manifest_id
+      - record_hashes
+      - package_hash
+      - hash_algorithm
+      - generated_at
+
+    rule: >
+      Integrity verification proves record consistency,
+      not factual truth or causal correctness.
+
+
+trace_export_rules:
+
+  immutable_history:
+    rule: >
+      Export MUST NOT rewrite source records.
+
+  reference_preservation:
+    rule: >
+      Original identifiers and versions MUST be preserved
+      or mapped through explicit immutable aliases.
+
+  uncertainty_preservation:
+    rule: >
+      Confidence, unresolved gaps, disputes,
+      retrospective inference labels,
+      and Temporal Illusion findings MUST survive export.
+
+  no_confidence_upgrade:
+    rule: >
+      Exporting a candidate causal path into a Trace package
+      MUST NOT upgrade it to supported or verified status.
+
+  partial_export:
+    rule: >
+      Partial trace export is permitted only when
+      omitted ranges or unavailable records are explicitly declared.
+
+  chronology_preservation:
+    rule: >
+      Event order and assertion order MUST remain distinguishable.
+
+  retrospective_preservation:
+    rule: >
+      Runtime observation and retrospective inference
+      MUST remain separately labeled after export.
+
+
+audit_scope:
+
+  required_domains:
+
+    temporal_continuity:
+      description: >
+        Check Pulse sequence, state timing,
+        and lifecycle continuity.
+
+    state_lineage:
+      description: >
+        Check predecessor, successor,
+        branch, supersession, reconciliation,
+        and termination relations.
+
+    cadence_integrity:
+      description: >
+        Check cadence reasons, budget,
+        hysteresis, sleep/wake conditions,
+        and Pulse Storm risk.
+
+    precedence_consistency:
+      description: >
+        Check local, structural,
+        and ontological precedence claims.
+
+    causality_integrity:
+      description: >
+        Check decision context,
+        evidence availability,
+        causal basis,
+        decision-action continuity,
+        and path gaps.
+
+    temporal_illusion:
+      description: >
+        Check for post-hoc reconstruction,
+        evidence backfill,
+        future knowledge backflow,
+        and context rewriting.
+
+    dispute_visibility:
+      description: >
+        Check that unresolved causal disputes
+        remain visible.
+
+    origin_binding:
+      description: >
+        Check Origin references without rewriting
+        runtime temporal history.
+
+    attribution_readiness:
+      description: >
+        Determine whether causal paths are suitable
+        for downstream contribution or Royalty review.
+
+
+audit_status_model:
+
+  statuses:
+
+    pass:
+      meaning: >
+        Required checks passed and no unresolved
+        material violations remain.
+
+    pass_with_warnings:
+      meaning: >
+        Core integrity requirements passed,
+        but non-blocking findings remain.
+
+    disputed:
+      meaning: >
+        One or more meaningful causal interpretations
+        remain under active challenge.
+
+    quarantine:
+      meaning: >
+        Records exist, but critical integrity,
+        temporal, or causal problems prevent normal use.
+
+    fail:
+      meaning: >
+        Critical violations invalidate required
+        protocol conformance.
+
+    human_review_required:
+      meaning: >
+        Automated checks cannot safely resolve
+        a material issue.
+
+
+audit_finding_model:
+
+  severity_levels:
+    - info
+    - warning
+    - error
+    - critical
+
+  required_fields:
+    - finding_id
+    - domain
+    - severity
+    - finding_code
+    - description
+    - affected_refs
+    - detected_at
+    - status
+
+  finding_statuses:
+    - open
+    - acknowledged
+    - under_review
+    - mitigated
+    - resolved
+    - rejected
+
+  allowed_domains:
+    - temporal_continuity
+    - state_lineage
+    - cadence_integrity
+    - precedence_consistency
+    - causality_integrity
+    - temporal_illusion
+    - dispute_visibility
+    - origin_binding
+    - attribution_readiness
+
+
+lifecycle_audit_pipeline:
+
+  stages:
+
+    stage_1_manifest_validation:
+      purpose: >
+        Validate trace package structure,
+        references, hashes, and version identity.
+
+      outputs:
+        - manifest_status
+        - unresolved_reference_refs
+        - integrity_finding_refs
+
+    stage_2_temporal_validation:
+      purpose: >
+        Validate Pulse order,
+        state sequence,
+        event timing,
+        and temporal range.
+
+      checks:
+        - pulse_sequence
+        - state_time_order
+        - transition_time_order
+        - event_assertion_time_separation
+
+    stage_3_lineage_validation:
+      purpose: >
+        Validate state lineage,
+        branching, supersession,
+        reconciliation, and termination.
+
+      checks:
+        - predecessor_resolution
+        - branch_identity
+        - reconciliation_sources
+        - supersession_integrity
+        - terminated_state_reuse
+
+    stage_4_cadence_validation:
+      purpose: >
+        Validate adaptive cadence decisions.
+
+      checks:
+        - reason_binding
+        - signal_availability
+        - budget_compliance
+        - hysteresis
+        - critical_duration
+        - sleep_wake_integrity
+        - pulse_storm_detection
+
+    stage_5_precedence_validation:
+      purpose: >
+        Validate precedence direction and dependency structure.
+
+      checks:
+        - local_precedence
+        - structural_prerequisite
+        - ontological_binding
+        - causal_direction_non_inversion
+        - cycle_detection
+
+    stage_6_causality_validation:
+      purpose: >
+        Validate causal bindings and paths.
+
+      checks:
+        - decision_context_integrity
+        - evidence_availability
+        - causal_basis
+        - decision_action_continuity
+        - path_gap_visibility
+        - counterfactual_method_integrity
+
+    stage_7_temporal_illusion_scan:
+      purpose: >
+        Detect retrospective history corruption.
+
+      checks:
+        - late_evidence_injection
+        - context_rewrite
+        - post_hoc_narrative
+        - chronology_only_causality
+        - future_knowledge_backflow
+        - superseded_decision_attribution
+
+    stage_8_dispute_propagation:
+      purpose: >
+        Carry unresolved disputes into audit output.
+
+    stage_9_origin_cross_reference:
+      purpose: >
+        Link verified or candidate Origin relations
+        without mutating historical runtime context.
+
+    stage_10_attribution_readiness:
+      purpose: >
+        Determine the maximum downstream attribution status
+        supported by current evidence and audit results.
+
+
+origin_cross_reference_model:
+
+  purpose: >
+    Connect temporal history with upstream provenance
+    while preserving causal time boundaries.
+
+  required_fields:
+    - cross_reference_id
+    - origin_ref
+    - temporal_entity_ref
+    - relation_type
+    - assertion_mode
+    - evidence_refs
+    - asserted_at
+
+  relation_types:
+    - originated_from
+    - derived_from
+    - enabled_by_origin
+    - transformed_from
+    - inspired_by
+    - disputed_origin_relation
+
+  assertion_modes:
+    - runtime_known
+    - runtime_used
+    - retrospective_inference
+    - human_verified
+    - machine_verified
+    - disputed
+
+  optional_time_fields:
+    - causal_effective_time
+    - discovered_at
+    - verified_at
+
+  rules:
+
+    no_runtime_rewrite:
+      rule: >
+        A retrospectively discovered Origin MUST NOT
+        be inserted into the original decision context.
+
+    origin_claim_separation:
+      rule: >
+        Provenance relation and runtime decision influence
+        MUST remain distinct claims.
+
+    evidence_requirement:
+      rule: >
+        Origin cross-reference MUST include evidence
+        or explicit unresolved status.
+
+    multiple_origins:
+      rule: >
+        Multiple competing or contributing Origin claims
+        MAY coexist.
+
+
+attribution_readiness_model:
+
+  purpose: >
+    Prevent unsupported temporal causality
+    from becoming downstream contribution or Royalty evidence.
+
+  readiness_statuses:
+
+    not_ready:
+      meaning: >
+        Trace or audit quality is insufficient
+        for attribution use.
+
+    candidate:
+      meaning: >
+        A contribution relation is plausible
+        but not sufficiently supported.
+
+    supported:
+      meaning: >
+        Evidence and causal path support
+        downstream attribution review.
+
+    verified:
+      meaning: >
+        Required audit and verification conditions passed.
+
+    disputed:
+      meaning: >
+        Attribution-relevant causal paths remain contested.
+
+    blocked:
+      meaning: >
+        Critical integrity or Temporal Illusion findings
+        prohibit attribution use.
+
+  readiness_rules:
+
+    verified_path_requirement:
+      rule: >
+        Automatic high-confidence attribution SHOULD require
+        verified or explicitly accepted supported causal paths.
+
+    dispute_guard:
+      rule: >
+        Open material disputes MUST propagate
+        to attribution readiness.
+
+    temporal_illusion_guard:
+      rule: >
+        Critical Temporal Illusion findings MUST set
+        readiness to blocked or not_ready.
+
+    path_gap_guard:
+      rule: >
+        Material causal gaps MUST prevent verified readiness.
+
+    origin_only_guard:
+      rule: >
+        Origin association alone MUST NOT prove
+        causal contribution to a specific downstream action.
+
+    chronology_only_guard:
+      rule: >
+        Earlier creation time alone MUST NOT establish
+        contribution or Royalty entitlement.
+
+    audit_scope_guard:
+      rule: >
+        Attribution systems MUST know
+        which audit domains were actually executed.
+
+
+royalty_bridge:
+
+  purpose: >
+    Provide a controlled interface
+    to downstream Royalty systems.
+
+  exportable_fields:
+    - audit_record_ref
+    - trace_package_ref
+    - supported_causal_path_refs
+    - origin_cross_reference_refs
+    - attribution_readiness
+    - open_dispute_refs
+    - temporal_illusion_finding_refs
+
+  prohibited_exports:
+    - hidden_confidence_upgrade
+    - suppressed_disputes
+    - rewritten_decision_context
+    - unsupported_origin_causality
+    - chronology_only_contribution_claim
+
+  rule: >
+    The bridge MAY export candidate attribution evidence,
+    but MUST preserve its confidence,
+    dispute, and audit status.
+
+
+trace_relay_bridge:
+
+  purpose: >
+    Allow temporal lifecycle traces to move
+    between agents, wings, systems, and derivative processes.
+
+  required_handoff_fields:
+    - source_trace_package_ref
+    - source_agent_ref
+    - receiving_agent_ref
+    - handed_off_at
+    - trace_scope
+    - integrity_status
+    - audit_status
+
+  rules:
+
+    no_history_mutation:
+      rule: >
+        Receiving agents MUST NOT rewrite
+        source historical records.
+
+    derivative_trace:
+      rule: >
+        New processing SHOULD create derivative Trace records
+        that reference the inherited package.
+
+    dispute_inheritance:
+      rule: >
+        Open disputes MUST remain attached
+        or explicitly superseded by reviewed resolution.
+
+    confidence_inheritance:
+      rule: >
+        Receiving systems MUST NOT silently raise causal confidence.
+
+    missing_context:
+      rule: >
+        Missing source context MUST remain visible
+        as an inheritance limitation.
+
+
+unified_temporal_lifecycle_record:
+
+  purpose: >
+    Provide one auditable view across
+    the complete first-arc temporal lifecycle.
+
+  required_sections:
+    - lifecycle_identity
+    - temporal_range
+    - pulse_summary
+    - state_lineage_summary
+    - transition_summary
+    - cadence_summary
+    - causal_path_summary
+    - trace_package
+    - audit_result
+    - attribution_readiness
+
+  optional_sections:
+    - origin_cross_references
+    - disputes
+    - temporal_illusion_findings
+    - human_review
+    - royalty_bridge_status
+
+  rule: >
+    The unified record is an index and audit view.
+    It MUST NOT replace the immutable source records.
+
+
+trace_audit_consistency_check:
+
+  id: "TACC"
+  name: "Trace & Audit Consistency Check"
+
+  execution_modes:
+    - on_trace_package_create
+    - on_audit_create
+    - on_trace_handoff
+    - on_origin_cross_reference
+    - on_attribution_export
+    - on_dispute_update
+
+  checks:
+
+    TACC_001_trace_reference_resolution:
+      severity: "error"
+
+      requirement: >
+        Required Trace package references MUST resolve
+        or be explicitly marked unavailable.
+
+      failure_code: "UNRESOLVED_TRACE_REFERENCE"
+
+    TACC_002_trace_status_integrity:
+      severity: "error"
+
+      requirement: >
+        Partial or disputed Trace packages MUST NOT
+        be exported as complete.
+
+      failure_code: "TRACE_STATUS_MISREPRESENTATION"
+
+    TACC_003_audit_scope_disclosure:
+      severity: "error"
+
+      requirement: >
+        Audit output MUST identify
+        which validation domains were executed.
+
+      failure_code: "UNDISCLOSED_AUDIT_SCOPE"
+
+    TACC_004_finding_propagation:
+      severity: "error"
+
+      requirement: >
+        Critical findings MUST propagate
+        to downstream readiness decisions.
+
+      failure_code: "FINDING_PROPAGATION_FAILURE"
+
+    TACC_005_dispute_visibility:
+      severity: "error"
+
+      requirement: >
+        Open material disputes MUST remain visible
+        in Trace handoff and attribution export.
+
+      failure_code: "DISPUTE_SUPPRESSION"
+
+    TACC_006_temporal_illusion_guard:
+      severity: "critical"
+
+      requirement: >
+        Critical Temporal Illusion findings MUST NOT
+        be hidden or downgraded during export.
+
+      failure_code: "TEMPORAL_ILLUSION_SUPPRESSION"
+
+    TACC_007_origin_non_rewrite:
+      severity: "error"
+
+      requirement: >
+        Origin cross-reference MUST NOT rewrite
+        historical decision context.
+
+      failure_code: "ORIGIN_HISTORY_REWRITE"
+
+    TACC_008_attribution_readiness_alignment:
+      severity: "error"
+
+      requirement: >
+        Attribution readiness MUST be compatible
+        with audit status and causal path status.
+
+      failure_code: "ATTRIBUTION_READINESS_OVERSTATEMENT"
+
+    TACC_009_confidence_preservation:
+      severity: "error"
+
+      requirement: >
+        Trace export or handoff MUST NOT silently
+        increase causal confidence.
+
+      failure_code: "CONFIDENCE_INFLATION"
+
+    TACC_010_integrity_truth_separation:
+      severity: "warning"
+
+      requirement: >
+        Cryptographic or record integrity success
+        MUST NOT be represented as causal verification.
+
+      failure_code: "INTEGRITY_CAUSALITY_CONFUSION"
+
+    TACC_011_partial_range_disclosure:
+      severity: "error"
+
+      requirement: >
+        Partial temporal range export MUST explicitly disclose
+        omitted or unavailable intervals.
+
+      failure_code: "HIDDEN_TEMPORAL_GAP"
+
+    TACC_012_source_record_immutability:
+      severity: "critical"
+
+      requirement: >
+        Audit and export processes MUST NOT overwrite
+        immutable source records.
+
+      failure_code: "SOURCE_HISTORY_MUTATION"
+
+
+failure_modes:
+
+  trace_completeness_illusion:
+    description: >
+      A complete-looking Trace package creates
+      false confidence that causal claims are verified.
+
+    symptoms:
+      - complete record count treated as causal proof
+      - integrity hash treated as factual validation
+      - audit skipped because package is structurally complete
+
+    mitigation:
+      - separate trace_status from audit_status
+      - causal audit requirement
+      - integrity-truth separation rule
+
+
+  audit_laundering:
+    description: >
+      A limited or partial audit is presented
+      as full verification.
+
+    symptoms:
+      - unspecified audit scope
+      - only schema validation performed
+      - downstream systems assume causal verification
+
+    mitigation:
+      - audit scope disclosure
+      - executed domain list
+      - domain-specific findings
+
+
+  dispute_suppression:
+    description: >
+      Open causal disputes are removed
+      during Trace export or attribution handoff.
+
+    mitigation:
+      - mandatory dispute propagation
+      - Trace package dispute refs
+      - attribution readiness downgrade
+
+
+  origin_history_rewrite:
+    description: >
+      A later Origin discovery is inserted
+      into earlier runtime decision context.
+
+    mitigation:
+      - non-destructive cross-reference
+      - retrospective inference label
+      - immutable context snapshot
+
+
+  attribution_overreach:
+    description: >
+      Weak or incomplete causal evidence
+      is exported as verified contribution.
+
+    symptoms:
+      - candidate path treated as verified
+      - chronology used as contribution proof
+      - Origin association treated as action causality
+
+    mitigation:
+      - readiness status
+      - causal path status preservation
+      - chronology-only guard
+      - Origin-only guard
+
+
+  confidence_inflation:
+    description: >
+      Confidence increases during handoff
+      without new evidence or verification.
+
+    mitigation:
+      - confidence inheritance rule
+      - explicit confidence change record
+      - audit evidence requirement
+
+
+  audit_trace_divergence:
+    description: >
+      Audit result references a different
+      Trace version than the one exported downstream.
+
+    mitigation:
+      - package hash binding
+      - version reference
+      - audit target manifest
+
+
+  hidden_temporal_gap:
+    description: >
+      Missing lifecycle intervals are omitted
+      without disclosure.
+
+    mitigation:
+      - temporal range declaration
+      - omitted interval record
+      - partial trace status
+
+
+  integrity_truth_confusion:
+    description: >
+      Valid cryptographic integrity is mistaken
+      for factual or causal correctness.
+
+    mitigation:
+      - separate integrity and causality fields
+      - independent audit stages
+      - explicit verification scope
+
+
+  derivative_trace_amnesia:
+    description: >
+      A downstream agent creates a new Trace
+      without reference to inherited temporal history.
+
+    mitigation:
+      - parent_trace_package_ref
+      - derivative relation
+      - handoff receipt
+
+
+  royalty_backflow_rewrite:
+    description: >
+      A later attribution or settlement event
+      is used to rewrite earlier causal history.
+
+    mitigation:
+      - downstream-only royalty bridge
+      - historical immutability
+      - incentive exception evidence requirement
+
+
+safety_requirements:
+
+  SR_001:
+    rule: >
+      A Trace package with critical unresolved integrity failures
+      MUST NOT be exported as attribution-ready.
+
+  SR_002:
+    rule: >
+      Temporal Illusion findings MUST remain visible
+      to all downstream audit and attribution consumers.
+
+  SR_003:
+    rule: >
+      Open high-impact causal disputes SHOULD require
+      human or multi-party review before verified attribution.
+
+  SR_004:
+    rule: >
+      Origin references MUST be added
+      through non-destructive cross-reference records.
+
+  SR_005:
+    rule: >
+      Royalty or value attribution systems MUST NOT
+      silently upgrade candidate causal paths.
+
+  SR_006:
+    rule: >
+      Trace handoff MUST preserve uncertainty,
+      confidence, disputes, and known gaps.
+
+  SR_007:
+    rule: >
+      Audit systems MUST identify their actual scope
+      and MUST NOT imply checks that were not executed.
+
+
+integration:
+
+  pulse_record:
+    relation: >
+      Supplies Pulse identity and temporal sequence.
+
+  state_transition_rule:
+    relation: >
+      Supplies state lineage, transition decisions,
+      branch, reconciliation, and lifecycle records.
+
+  adaptive_cadence_policy:
+    relation: >
+      Supplies timing policy and Pulse scheduling causality.
+
+  temporal_causality_binding:
+    relation: >
+      Supplies causal bindings, causal paths,
+      decision context, evidence availability,
+      disputes, and Temporal Illusion findings.
+
+  structural_precedence_core:
+    relation: >
+      Supplies directional precedence relationships
+      and precedence consistency requirements.
+
+  trace_relay_protocol:
+    relation: >
+      Receives exported temporal Trace packages
+      for cross-agent and cross-generation transmission.
+
+  origin_trace_receipt:
+    relation: >
+      Supplies immutable provenance evidence
+      for non-destructive Origin cross-reference.
+
+  ai_origin_royalty_audit:
+    relation: >
+      Consumes attribution-ready causal paths
+      and associated audit limitations.
+
+  agent_handoff_record:
+    relation: >
+      May transport temporal Trace package references
+      during agent-to-agent transfer.
+
+final_principle: >
+  Temporal history should survive movement across systems
+  without becoming cleaner, stronger, or more certain
+  than the evidence actually supports.
+
+  Trace preserves what was recorded.
+  Audit tests what may be claimed.
+  Origin explains where structures came from.
+  Attribution determines what contribution may be recognized.
+  Royalty returns value only after those distinctions remain intact.
